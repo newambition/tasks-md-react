@@ -15,7 +15,7 @@ const TaskCard = React.memo(({ id, task = {}, columnId, onDeleteTask, onUpdateTa
         setNodeRef,
         transform,
         transition,
-        isDragging, // Key state for the "lift" effect
+        isDragging,
     } = useSortable({
         id: id,
         data: {
@@ -25,30 +25,50 @@ const TaskCard = React.memo(({ id, task = {}, columnId, onDeleteTask, onUpdateTa
         }
     });
 
-    // Define the scale factor for when the card is "lifted" (being dragged)
-    const liftScale = 1.05; // e.g., scale up by 5%
+    const liftScale = 1.03; // Slightly reduced scale for a more subtle lift
 
-    const style = {
-        // Apply the scale transform when isDragging is true
-        // Combine with the existing transform from useSortable for movement
-        transform: CSS.Transform.toString(transform ? { ...transform, scaleX: isDragging ? liftScale : 1, scaleY: isDragging ? liftScale : 1 } : null),
-        transition: transition || `transform 250ms ease, opacity 200ms ease-out`, // Ensure transition includes transform
-        opacity: isDragging ? 0.7 : 1, // Slightly more opaque when dragging the actual item
-        cursor: isDragging ? 'grabbing' : 'grab',
-        zIndex: isDragging ? 9999 : 'auto',
-        minHeight: '80px',
-        boxShadow: isDragging ? '0 15px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)' : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', // Enhanced shadow when lifted
+    // Base style from useSortable, we will add to this or override
+    const sortableStyle = {
+        transform: CSS.Transform.toString(transform),
+        transition: transition || `transform 250ms ease, box-shadow 200ms ease, opacity 200ms ease-out`, // Added box-shadow to transition
+        fontFamily: 'var(--cartoon-font)', // Ensure cartoon font is applied
     };
-    
-    // Style for the card when it's rendered in the DragOverlay
-    const overlayStyle = {
-        opacity: 0.85, // Overlay can be slightly more opaque
-        cursor: 'grabbing',
-        zIndex: 9999,
-        minHeight: '80px',
-        transform: `scale(${liftScale})`, // Always scaled up in overlay
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)', // Prominent shadow for overlay
-    };
+
+    let combinedStyle = { ...sortableStyle };
+    let cardClasses = `card-base p-4 flex flex-col justify-between touch-manipulation`; // Using p-4 for 1rem
+
+    if (isDraggingOverlay) {
+        combinedStyle = {
+            ...combinedStyle,
+            opacity: 0.9,
+            cursor: 'grabbing',
+            zIndex: 9999,
+            minHeight: '90px', // Min height for consistency
+            transform: `scale(${liftScale}) rotate(-1deg)`, // Apply scale and slight rotate
+            boxShadow: '8px 8px 0px var(--cartoon-shadow-color)', // Prominent cartoon shadow
+        };
+    } else if (isDragging) {
+        combinedStyle = {
+            ...combinedStyle,
+            opacity: 0.85,
+            cursor: 'grabbing',
+            zIndex: 9999,
+            minHeight: '90px',
+            // Apply scale from useSortable's transform, add rotation and stronger shadow
+            transform: CSS.Transform.toString(transform ? { ...transform, scaleX: liftScale, scaleY: liftScale, rotate: '-1deg' } : { scaleX: liftScale, scaleY: liftScale, rotate: '-1deg' }),
+            boxShadow: '7px 7px 0px var(--cartoon-shadow-color)', // Hover-like shadow when dragging
+        };
+        // Remove hover effects from card-base if isDragging to prevent conflict
+        cardClasses = cardClasses.replace("hover:transform", "").replace("hover:translate-x-[-2px]", "").replace("hover:translate-y-[-2px]", "").replace("hover:rotate-[-1deg]", "").replace("hover:shadow-[6px_6px_0px_var(--cartoon-shadow-color)]", "");
+
+    } else {
+         // Default state, rely on .card-base for shadow and hover effects
+        combinedStyle = {
+            ...combinedStyle,
+            minHeight: '90px', // Consistent min height
+            cursor: 'grab',
+        };
+    }
 
 
     useEffect(() => {
@@ -58,10 +78,10 @@ const TaskCard = React.memo(({ id, task = {}, columnId, onDeleteTask, onUpdateTa
     }, [isEditingDate]);
 
     if (!task || !task.id) {
-        return <div className="p-3 rounded-md border border-red-500 bg-red-100 text-red-700 text-xs h-[80px]">Invalid Task Data (ID missing)</div>;
+        return <div className="card-base p-4 text-cartoon-secondary border-cartoon-secondary shadow-[4px_4px_0px_var(--cartoon-secondary)] h-[90px]">Invalid Task Data (ID missing)</div>;
     }
-    if (!columnId && !task.status) { // columnId is passed for context, task.status is source of truth
-         return <div className="p-3 rounded-md border border-red-500 bg-red-100 text-red-700 text-xs h-[80px]">Invalid Task Data (Status missing)</div>;
+    if (!columnId && !task.status) {
+         return <div className="card-base p-4 text-cartoon-secondary border-cartoon-secondary shadow-[4px_4px_0px_var(--cartoon-secondary)] h-[90px]">Invalid Task Data (Status missing)</div>;
     }
 
     const overdue = task.dueDate && task.status !== 'done' && isOverdue(task.dueDate);
@@ -106,25 +126,27 @@ const TaskCard = React.memo(({ id, task = {}, columnId, onDeleteTask, onUpdateTa
     return (
         <div
             ref={setNodeRef}
-            style={isDraggingOverlay ? overlayStyle : style}
-            className={`task-card p-3 rounded-md border border-[var(--border-card)] bg-[var(--bg-secondary)] shadow-sm hover:shadow-xl flex flex-col justify-between touch-manipulation`}
+            style={combinedStyle}
+            className={cardClasses}
             data-task-id={task.id}
             {...attributes}
             {...listeners}
         >
             <div className="flex justify-between items-start mb-2 gap-2">
-                <span className="task-card-text text-sm text-[var(--text-heading)] leading-snug break-words flex-grow">
+                <span className="task-card-text text-sm leading-snug break-words flex-grow" style={{color: 'var(--cartoon-text)', fontWeight: 400}}>
                     {task.text}
                 </span>
                 <button
-                    className="delete-btn text-lg leading-none p-0 px-1 rounded-full text-[var(--delete-btn-text)] hover:text-[var(--delete-btn-hover-text)] hover:bg-[var(--delete-btn-hover-bg)] transition-colors duration-150 flex-shrink-0"
+                    // Small circular action button for delete
+                    className="w-7 h-7 p-0 flex items-center justify-center rounded-full border-2 border-solid bg-white shadow-[1.5px_1.5px_0px_var(--cartoon-border-dark)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[0.5px_0.5px_0px_var(--cartoon-border-dark)] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-none transition-all duration-100 ease-in-out flex-shrink-0"
+                    style={{ borderColor: 'var(--cartoon-border-dark)', color: 'var(--cartoon-secondary)'}}
                     title="Delete task"
                     onClick={handleDeleteClick}
                 >
-                    ×
+                    <span className="text-lg leading-none font-bold">&times;</span>
                 </button>
             </div>
-            <div className="task-card-date-container flex items-center gap-1 min-h-[20px] mt-auto">
+            <div className="task-card-date-container flex items-center gap-1 min-h-[24px] mt-auto"> {/* Increased min-height slightly */}
                 {isEditingDate ? (
                     <input
                         ref={dateInputRef} type="date" value={currentDueDate}
@@ -132,18 +154,28 @@ const TaskCard = React.memo(({ id, task = {}, columnId, onDeleteTask, onUpdateTa
                         onBlur={internalHandleDateBlur}
                         onKeyDown={internalHandleDateKeyDown}
                         onClick={(e) => e.stopPropagation()}
-                        className="task-card-date-input input-base p-0 px-1 text-xs w-auto inline-block"
-                        style={{ lineHeight: 'normal' }}
+                        // Mini cartoon date input
+                        className="p-1 text-xs w-auto inline-block border-2 rounded-md outline-none"
+                        style={{
+                            fontFamily: 'var(--cartoon-font)',
+                            borderColor: 'var(--cartoon-border-dark)',
+                            backgroundColor: 'white',
+                            color: 'var(--cartoon-text)',
+                            boxShadow: '1px 1px 0px var(--cartoon-shadow-color)', // Subtle shadow for tiny input
+                        }}
                     />
                 ) : (
                     <div
-                        className={`task-card-date text-xs inline-flex items-center cursor-pointer ${
-                            task.dueDate ? (overdue ? 'text-[var(--overdue-text)] font-medium' : 'text-[var(--text-muted)]')
-                                         : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] italic'
-                        }`}
+                        className={`task-card-date text-xs inline-flex items-center cursor-pointer p-0.5 rounded-md hover:bg-cartoon-bg-medium`}
+                        style={{
+                            fontFamily: 'var(--cartoon-font)',
+                            color: task.dueDate ? (overdue ? 'var(--cartoon-secondary)' : 'var(--cartoon-text)') 
+                                                : 'var(--cartoon-border-medium)',
+                            fontWeight: task.dueDate && overdue ? 700 : 400,
+                        }}
                         title={dateTitle} onClick={internalHandleDateClick}
                     >
-                        <span className={`task-card-date-icon mr-1 text-xs ${task.dueDate && overdue ? 'text-[var(--overdue-icon)]' : 'text-[var(--text-secondary)]'}`}>📅</span>
+                        <span className={`task-card-date-icon mr-1.5 text-sm ${task.dueDate && overdue ? 'text-[var(--cartoon-secondary)]' : 'text-[var(--cartoon-text)]'}`}>📅</span>
                         <span className="task-card-date-text">{displayDate ? displayDate : 'Set Due Date'}</span>
                     </div>
                 )}

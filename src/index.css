@@ -1,198 +1,382 @@
 /* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap'); /* [cite: 4] */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* --- Base Styles --- */
 :root {
-    --bg-primary: #fafcff; /* gray-100 */
-    --bg-secondary: white;
-    --bg-tertiary: #f9fafb; /* gray-50 */
-    --text-primary: #1f2937; /* gray-800 */
-    --text-secondary: #4b5563; /* gray-600 */
-    --text-muted: #6b7280; /* gray-500 */
-    --text-heading: #1d4ed8; /* gray-900 */
-    --text-inverted: white;
-    --text-link: #1d4ed8; /* blue-700 */
-    --border-color: #dde3eb; /* gray-300 */
-    --border-card: #ced1d6; /* gray-200 */
-    --input-bg: white;
-    --input-border: #d1d5db; /* gray-300 */
-    --button-primary-bg: #2563eb; /* blue-600 */
-    --button-primary-hover-bg: #1d4ed8; /* blue-700 */
-    --button-secondary-bg: #e0e7ff; /* indigo-100 */
-    --button-secondary-hover-bg: #c7d2fe; /* indigo-200 */
-    --button-secondary-text: #1d4ed8; /* blue-700 */
-    --header-todo-bg: #f97316; /* orange-500 */
-    --header-inprogress-bg: #3b82f6; /* blue-500 */
-    --header-done-bg: #22c55e; /* green-500 */
-    --delete-btn-text: #9ca3af; /* gray-400 */
-    --delete-btn-hover-text: #ef4444; /* red-500 */
-    --delete-btn-hover-bg: #fee2e2; /* red-100 */
-    --overdue-text: #dc2626; /* red-600 */
-    --overdue-icon: #ef4444; /* red-500 */
-    --drag-over-bg: #eff6ff; /* blue-50 */
-    --drag-over-outline: #93c5fd; /* blue-300 */
-    --scrollbar-track: #e5e7eb; /* gray-200 */
-    --scrollbar-thumb: #a1a1aa; /* zinc-400 */
-    --scrollbar-thumb-hover: #71717a; /* zinc-500 */
+    /* Light Mode Cartoon Color Palette (CSS Variables) */
+    --cartoon-font: 'Nunito', sans-serif; /* [cite: 3] */
+    --cartoon-primary: #00AEEF; /* Bright Sky Blue - for primary actions, titles [cite: 3] */
+    --cartoon-secondary: #FF6B6B; /* Playful Coral Red - for highlights, active states, alerts [cite: 3] */
+    --cartoon-accent: #FFD166; /* Sunny Yellow - for secondary actions, badges, timeline header [cite: 3] */
+    --cartoon-green: #06D6A0; /* Bright Mint Green - for success states, alternative actions, badges [cite: 3] */
+    --cartoon-text: #4A4A4A; /* Dark Gray - for body text [cite: 3] */
+    --cartoon-text-light: #ffffff; /* White - for text on dark/colored backgrounds [cite: 3] */
+    --cartoon-bg-light: #F5F9FC; /* Very Light Blue/Gray - for main backgrounds [cite: 4] */
+    --cartoon-bg-medium: #E0E8EF; /* Slightly darker light blue/gray - for component backgrounds [cite: 4] */
+    --cartoon-border-dark: #08084b; /* Dark Blue/Purple - for all outlines and key shadow elements [cite: 4] */
+    --cartoon-border-medium: #A0AEC0; /* Medium Gray - for inactive states, placeholders [cite: 4] */
+    --cartoon-border-light: #CAD5E0; /* Light Gray - for subtle borders [cite: 4] */
+    --cartoon-shadow-color: rgba(51, 58, 122, 0.4); /* Shadow color derived from --cartoon-border-dark [cite: 4] */
+
+    /* Generic variables for Light Mode */
+    --bg-primary: var(--cartoon-bg-light);
+    --bg-header: var(--cartoon-bg-light);
+    --bg-secondary: var(--cartoon-bg-medium); /* Cards, Modals will use this slightly off-white */
+    --bg-component-explicit-white: #ffffff; /* For elements that MUST be white in light mode, e.g. select bg */
+    --bg-tertiary: var(--cartoon-bg-light); /* Columns will use main light bg */
+    --text-primary: var(--cartoon-text);
+    --text-secondary: #6B7280; /* Slightly lighter dark gray */
+    --text-muted: var(--cartoon-border-medium);
+    --text-heading: var(--cartoon-primary);
+    --text-inverted: var(--cartoon-text-light);
+    --text-link: var(--cartoon-primary);
+    --border-color: var(--cartoon-border-medium);
+    --border-card: var(--cartoon-border-dark);
+    --input-bg: var(--cartoon-bg-medium); /* Inputs will use off-white */
+    --input-border: var(--cartoon-border-dark);
+    --button-primary-bg: var(--cartoon-primary);
+    --button-primary-hover-bg: #0095D3;
+    --button-secondary-bg: var(--cartoon-accent);
+    --button-secondary-hover-bg: #FFC142;
+    --button-secondary-text: var(--cartoon-border-dark);
+    --header-todo-bg: var(--cartoon-accent);
+    --header-inprogress-bg: var(--cartoon-primary);
+    --header-done-bg: var(--cartoon-green);
+    --delete-btn-text: var(--cartoon-secondary);
+    --delete-btn-hover-text: #D32F2F;
+    --delete-btn-hover-bg: #FFCDD2;
+    --overdue-text: var(--cartoon-secondary);
+    --overdue-icon: var(--cartoon-secondary);
+    --drag-over-bg: #D1E9FA; /* Light blue for drag over */
+    --drag-over-outline: var(--cartoon-primary);
+    --scrollbar-track: var(--cartoon-bg-medium);
+    --scrollbar-thumb: var(--cartoon-border-medium);
+    --scrollbar-thumb-hover: var(--cartoon-border-dark);
+
     color-scheme: light;
 }
 
 html.dark {
-    --bg-primary: #111827; /* gray-900 */
-    --bg-secondary: #1f2937; /* gray-800 */
-    --bg-tertiary: #374151; /* gray-700 */
-    --text-primary: #d1d5db; /* gray-300 */
-    --text-secondary: #9ca3af; /* gray-400 */
-    --text-muted: #6b7280; /* gray-500 */
-    --text-heading: #a5b4fc; /* gray-50 */
-    --text-inverted: #1f2937; /* gray-800 */
-    --text-link: #60a5fa; /* blue-400 */
-    --border-color: #4b5563; /* gray-600 */
-    --border-card: #4b5563; /* gray-600 */
-    --input-bg: #374151; /* gray-700 */
-    --input-border: #4b5563; /* gray-600 */
-    --button-primary-bg: #3b82f6; /* blue-500 */
-    --button-primary-hover-bg: #60a5fa; /* blue-400 */
-    --button-secondary-bg: #312e81; /* indigo-900 */
-    --button-secondary-hover-bg: #3730a3; /* indigo-800 */
-    --button-secondary-text: #a5b4fc; /* indigo-300 */
-    /* Headers look ok with dark text on light bg, or use same colors? Using same for now */
-    /* --header-todo-bg: #f97316; */
-    /* --header-inprogress-bg: #3b82f6; */
-    /* --header-done-bg: #22c55e; */
-    --delete-btn-text: #9ca3af; /* gray-400 */
-    --delete-btn-hover-text: #fda4af; /* red-300 */
-    --delete-btn-hover-bg: #4b5563; /* gray-600 */
-    --overdue-text: #f87171; /* red-400 */
-    --overdue-icon: #fca5a5; /* red-300 */
-    --drag-over-bg: #1e3a8a; /* blue-900 */
-    --drag-over-outline: #3b82f6; /* blue-500 */
-    --scrollbar-track: #1f2937; /* gray-800 */
-    --scrollbar-thumb: #4b5563; /* gray-600 */
-    --scrollbar-thumb-hover: #6b7280; /* gray-500 */
-     color-scheme: dark;
+    /* Dark Mode Cartoon Color Palette (Dusky Cartoon Style) */
+    /* Main page background is darker, components remain relatively light to preserve dark shadow effect */
+    --cartoon-dm-bg-main: #4A5568; /* Medium-Dark Gray-Blue for main page background */
+    --cartoon-dm-bg-component: #E0E8EF; /* Light Blue-Gray for component backgrounds (cards, inputs) */
+    --cartoon-dm-bg-column: #CBD5E0; /* Slightly darker light gray for columns */
+    --cartoon-dm-text-primary: #2D3748; /* Darker Gray for text, good contrast on component BGs */
+    --cartoon-dm-text-secondary: #4A5568; /* Medium gray for secondary text */
+    --cartoon-dm-text-muted: #718096; /* Slightly lighter medium gray for placeholders */
+    --cartoon-dm-border-medium: #A0AEC0; /* For muted borders */
+    --cartoon-dm-border-light: #CBD5E0; /* For subtle borders */
+
+    /* Core cartoon colors (borders, shadows, accents) remain the same to preserve the style */
+    /* --cartoon-font: 'Nunito', sans-serif; (no change) */
+    /* --cartoon-primary: #00AEEF; (no change) */
+    /* --cartoon-secondary: #FF6B6B; (no change) */
+    /* --cartoon-accent: #FFD166; (no change) */
+    /* --cartoon-green: #06D6A0; (no change) */
+    /* --cartoon-text-light: #ffffff; (no change) */
+    /* --cartoon-border-dark: #333A7A; (no change) */
+    --cartoon-shadow-color: rgba(6, 8, 34, 0.774); 
+    --cartoon-header-shadow: rgba(0, 0, 0, 0.97); /* (no change) */
+
+    /* Generic variables for Dark Mode */
+    --bg-primary: var(--cartoon-dm-bg-main);
+    --bg-header: var(--cartoon-dm-bg-column);
+    --bg-secondary: var(--cartoon-dm-bg-component); /* For Cards, Modals */
+    --bg-component-explicit-white: var(--cartoon-dm-bg-component); /* Select bg will use this */
+    --bg-tertiary: var(--cartoon-dm-bg-column);    /* For Columns */
+    --text-primary: var(--cartoon-dm-text-primary);
+    --text-secondary: var(--cartoon-dm-text-secondary);
+    --text-muted: var(--cartoon-dm-border-medium);
+    --text-heading: var(--cartoon-primary); /* Keep vibrant */
+    --text-inverted: var(--cartoon-text-light); /* White text on colored buttons/headers */
+    --text-link: var(--cartoon-primary);
+    --border-color: var(--cartoon-dm-border-medium);
+    --border-card: var(--cartoon-border-dark); /* Dark border on light-ish card bg */
+    --input-bg: var(--cartoon-dm-bg-component);
+    --input-border: var(--cartoon-border-dark);
+    
+    --button-primary-bg: var(--cartoon-primary);
+    --button-primary-hover-bg: color-mix(in srgb, var(--cartoon-primary) 85%, black);
+    --button-secondary-bg: var(--cartoon-accent);
+    --button-secondary-hover-bg: color-mix(in srgb, var(--cartoon-accent) 85%, black);
+    --button-secondary-text: var(--cartoon-border-dark); /* Dark text on yellow button - still works */
+    
+    --header-todo-bg: var(--cartoon-accent); /* Text: --cartoon-border-dark - OK */
+    --header-inprogress-bg: var(--cartoon-primary); /* Text: --cartoon-text-light - OK */
+    --header-done-bg: var(--cartoon-green); /* Text: --cartoon-text-light - OK */
+    
+    --delete-btn-text: var(--cartoon-secondary);
+    --delete-btn-hover-text: var(--cartoon-secondary); /* Keep it bright */
+    --delete-btn-hover-bg: color-mix(in srgb, var(--cartoon-secondary) 15%, transparent); /* Subtle hover bg */
+    
+    --overdue-text: var(--cartoon-secondary);
+    --overdue-icon: var(--cartoon-secondary);
+    
+    --drag-over-bg: #A0AEC0; /* Darker than column bg for drag over */
+    --drag-over-outline: var(--cartoon-primary);
+    
+    --scrollbar-track: var(--cartoon-dm-border-light); 
+    --scrollbar-thumb: var(--cartoon-dm-text-secondary); 
+    --scrollbar-thumb-hover: var(--cartoon-dm-text-primary); 
+
+    color-scheme: dark;
 }
 
 /* Apply base body styles using CSS variables */
 body {
-    @apply font-sans flex flex-col min-h-screen transition-colors duration-300 ease-in-out;
+    @apply flex flex-col min-h-screen transition-colors duration-300 ease-in-out;
+    font-family: var(--cartoon-font); /* [cite: 3] */
     background-color: var(--bg-primary);
     color: var(--text-primary);
 }
 
-/* Button Base Styles (Can be applied with @apply or used as global classes) */
-.btn {
-    @apply px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ease-in-out;
+/* General "pop-out" shadow utility */
+.cartoon-shadow {
+    box-shadow: 4px 4px 0px var(--cartoon-shadow-color); /* [cite: 14] */
 }
+.cartoon-shadow-sm {
+    box-shadow: 2px 2px 0px var(--cartoon-shadow-color);
+}
+.cartoon-shadow-lg {
+    box-shadow: 8px 8px 0px var(--cartoon-shadow-color);
+}
+.cartoon-border {
+    border: 3px solid var(--cartoon-border-dark); /* [cite: 9, 10] */
+}
+.cartoon-border-sm {
+    border: 2px solid var(--cartoon-border-dark);
+}
+
+
+/* Button Base Styles */
+.btn {
+    @apply px-4 py-2 font-medium focus:outline-none transition-all duration-200 ease-in-out;
+    font-family: var(--cartoon-font);
+    font-weight: 700; /* [cite: 7, 21] */
+    border-radius: 10px; /* [cite: 11, 19] */
+    border: 2.5px solid var(--cartoon-border-dark); /* [cite: 10, 21] */
+    box-shadow: 2px 2px 0px var(--cartoon-border-dark); /* [cite: 14, 22] */
+    color: var(--text-inverted); /* Changed from --cartoon-text-light to --text-inverted for flexibility */
+}
+.btn:focus {
+    @apply ring-2 ring-offset-1;
+    ring-color: var(--cartoon-primary);
+    /* Use a consistent ring offset color for both light and dark */
+    ring-offset-color: var(--bg-primary); 
+}
+.btn:hover {
+    transform: translate(1px, 1px); /* [cite: 24] */
+    box-shadow: 1px 1px 0px var(--cartoon-border-dark); /* [cite: 24] */
+}
+.btn:active {
+    transform: translate(2px, 2px); /* [cite: 25] */
+    box-shadow: none; /* [cite: 25] */
+}
+
 .btn-primary {
-    @apply text-white focus:ring-blue-500;
-    background-color: var(--button-primary-bg);
+    background-color: var(--button-primary-bg); /* [cite: 20] */
+    color: var(--text-inverted); /* Ensures correct text color from theme */
 }
 .btn-primary:hover {
-    background-color: var(--button-primary-hover-bg);
-}
-.btn-primary:active {
-     @apply transform scale-[0.97];
+    background-color: var(--button-primary-hover-bg); /* [cite: 23] */
 }
 
 .btn-secondary {
-    @apply border border-transparent focus:ring-indigo-500;
-    color: var(--button-secondary-text);
-    background-color: var(--button-secondary-bg);
+    background-color: var(--button-secondary-bg); /* [cite: 20] */
+    color: var(--button-secondary-text); /* [cite: 21] */
 }
 .btn-secondary:hover {
-    background-color: var(--button-secondary-hover-bg);
-}
-.btn-secondary:active {
-     @apply transform scale-[0.96];
+    background-color: var(--button-secondary-hover-bg); /* [cite: 23] */
 }
 
-/* Styled Select (Replicates original CSS) */
+.btn-success {
+    background-color: var(--cartoon-green); /* [cite: 20] */
+    color: var(--text-inverted); /* [cite: 21] */
+}
+.btn-success:hover {
+    background-color: color-mix(in srgb, var(--cartoon-green) 85%, black);
+}
+
+.btn-danger {
+    background-color: var(--cartoon-secondary);
+    color: var(--text-inverted);
+}
+.btn-danger:hover {
+    background-color: color-mix(in srgb, var(--cartoon-secondary) 85%, black);
+}
+
+
+/* Styled Select */
 .styled-select {
-    @apply text-sm font-medium rounded-md border border-solid cursor-pointer transition-all duration-200 ease-in-out;
-    padding: 0.3rem 1.75rem 0.3rem 0.75rem; /* Adjusted padding 
-    color: var(--button-secondary-text);
-    background-color: var(--button-secondary-bg);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%231d4ed8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); /* Light mode arrow 
+    @apply text-sm cursor-pointer transition-all duration-200 ease-in-out;
+    font-family: var(--cartoon-font);
+    font-weight: 600; /* [cite: 6] */
+    padding: 0.5rem 2.25rem 0.5rem 1rem;
+    border-radius: 10px; /* [cite: 11] */
+    border: 2.5px solid var(--cartoon-border-dark); /* [cite: 10] */
+    box-shadow: 2px 2px 0px var(--cartoon-border-dark); /* [cite: 14] */
+    color: var(--text-primary); /* Use theme text color */
+    background-color: var(--bg-component-explicit-white); /* Use specific var for white/light component bg */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333A7A'%3e%3cpath d='M7 10l5 5 5-5H7z'/%3e%3c/svg%3e"); /* Dark blue arrow for light mode */
     background-position: right 0.5rem center;
     background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
+    background-size: 1.75em 1.75em;
     -webkit-appearance: none;
-    appearance: none; 
-
+    appearance: none;
+}
+html.dark .styled-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E0E8EF'%3e%3cpath d='M7 10l5 5 5-5H7z'/%3e%3c/svg%3e"); /* Light arrow for dark mode */
+}
 .styled-select:hover {
-    background-color: var(--button-secondary-hover-bg);
+    border-color: var(--cartoon-primary);
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px var(--cartoon-border-dark);
 }
 .styled-select:focus {
-    @apply outline-none ring-2 ring-offset-0 ring-blue-500; /* Adjusted focus ring */
-    border-color: var(--input-border); /* Keep border consistent on focus */
+    @apply outline-none ring-2 ring-offset-1;
+    ring-color: var(--cartoon-primary);
+    ring-offset-color: var(--bg-primary); /* Use main bg for offset */
+    border-color: var(--cartoon-primary);
 }
 
 /* Input Base Styles */
 .input-base {
-    @apply text-sm rounded-md border p-2 transition-colors duration-300 ease-in-out;
-    background-color: var(--input-bg);
-    color: var(--text-primary);
-    border-color: var(--input-border);
-    color-scheme: var(--color-scheme); /* For date input */
+    @apply text-sm p-3;
+    font-family: var(--cartoon-font);
+    font-weight: 600; /* [cite: 6, 35] */
+    border-radius: 10px; /* [cite: 11] */
+    border: 2.5px solid var(--input-border); /* [cite: 9, 10] Changed to use var */
+    background-color: var(--input-bg); /* Use theme var */
+    color: var(--text-primary); /* [cite: 35] Use theme var */
+    box-shadow: 2px 2px 0px var(--cartoon-shadow-color); /* [cite: 13] */
+    transition: all 0.2s ease-in-out;
+    outline: none; /* [cite: 34] */
 }
 .input-base::placeholder {
-    color: var(--text-muted);
+    color: var(--text-muted); /* [cite: 35] Use theme var */
+    font-weight: 400;
 }
 .input-base:focus {
-    @apply outline-none ring-2 ring-blue-500 border-blue-500;
+    border-color: var(--cartoon-primary);
+    box-shadow: 3px 3px 0px var(--cartoon-primary);
+    /* ring-offset-color: var(--bg-primary); /* If adding ring */
 }
 
-/* Action Button (for edit/delete/theme icons) */
+/* Action Button */
 .action-btn {
-    @apply p-1 rounded text-lg leading-none transition-colors duration-200 ease-in-out;
-    color: var(--text-muted);
+    @apply p-2 rounded-full leading-none transition-all duration-200 ease-in-out;
+    font-family: var(--cartoon-font);
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--cartoon-border-dark); /* [cite: 21] */
+    box-shadow: 1.5px 1.5px 0px var(--cartoon-border-dark); /* [cite: 22] */
+    color: var(--cartoon-border-dark); /* Text color of icon */
+    background-color: var(--bg-secondary); /* Use component bg */
 }
 .action-btn:hover {
-    background-color: var(--bg-tertiary);
-    color: var(--text-primary);
+    transform: translate(1px, 1px);
+    box-shadow: 0.5px 0.5px 0px var(--cartoon-border-dark);
+    background-color: var(--cartoon-accent);
+    color: var(--cartoon-border-dark); /* Text color on hover */
+}
+.action-btn:active {
+    transform: translate(1.5px, 1.5px);
+    box-shadow: none;
 }
 .action-btn-delete:hover {
-    color: var(--delete-btn-hover-text);
-    background-color: var(--delete-btn-hover-bg);
+    background-color: var(--cartoon-secondary); /* [cite: 20] */
+    color: var(--text-inverted); /* [cite: 21] */
 }
 
 /* Kanban Column Styles */
 .kanban-column {
-    @apply min-h-[600px] max-h-[800px] my-4 rounded-lg shadow-md border border-border-color flex flex-col overflow-hidden transition-colors duration-300 ease-in-out;
-    background-color: var(--bg-tertiary);
+    @apply min-h-[600px] max-h-[800px] my-4 flex flex-col overflow-hidden;
+    background-color: var(--bg-tertiary); /* Use theme var */
+    border-radius: 20px; /* [cite: 11, 30] */
+    border: 3px solid var(--cartoon-border-dark); /* [cite: 9, 29] */
+    box-shadow: 8px 8px 0px var(--cartoon-shadow-color); /* [cite: 12, 14, 29] */
+    transition: all 0.3s ease-in-out;
 }
+/* Kanban Header uses specific vibrant BGs, text color handled by --text-inverted or --button-secondary-text */
 .kanban-header {
-    @apply font-semibold p-3 text-center transition-colors duration-300 ease-in-out;
-    color: var(--text-inverted); /* Inverted text for headers */
+    @apply font-semibold p-4 text-center;
+    font-family: var(--cartoon-font);
+    font-weight: 800; /* [cite: 8] */
+    /* color is set by specific header classes below */
+    border-bottom: 3px solid var(--cartoon-border-dark); /* [cite: 9] */
+    border-radius: 17px 17px 0 0;
 }
-.header-todo { background-color: var(--header-todo-bg); }
-.header-inprogress { background-color: var(--header-inprogress-bg); }
-.header-done { background-color: var(--header-done-bg); }
+.header-todo { background-color: var(--header-todo-bg); color: var(--button-secondary-text); } /* [cite: 3] */
+.header-inprogress { background-color: var(--header-inprogress-bg); color: var(--text-inverted); } /* [cite: 3] */
+.header-done { background-color: var(--header-done-bg); color: var(--text-inverted); } /* [cite: 3] */
 
 .task-list-container {
-    @apply p-4 flex-grow overflow-y-auto; /* Ensure container grows and scrolls */
+    @apply p-4 flex-grow overflow-y-auto;
 }
 .task-list {
-    @apply space-y-3;
+    @apply space-y-4;
+}
+
+/* Card Base Styles */
+.card-base {
+    background-color: var(--bg-component-explicit-white); /* Use specific var for white/light component bg */
+    border: 3px solid var(--border-card); /* [cite: 29] Use theme var */
+    box-shadow: 4px 4px 0px var(--cartoon-shadow-color); /* [cite: 29] */
+    border-radius: 20px; /* [cite: 30] */
+    padding: 1rem;
+    font-family: var(--cartoon-font);
+    color: var(--text-primary); /* Use theme var */
+    transition: all 0.2s ease-in-out;
+}
+.card-base:hover {
+    transform: translate(-2px, -2px) rotate(-1deg); /* [cite: 30] */
+    box-shadow: 6px 6px 0px var(--cartoon-shadow-color); /* [cite: 30] */
 }
 
 /* Scrollbar Styles */
-::-webkit-scrollbar { width: 0px; height: 0px; }
-::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 3px; }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
-
-/* Add Inter font (if not already included by CRA/Tailwind defaults) */
-@import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-body {
-    font-family: 'Inter', sans-serif;
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track); /* Use theme var */
+    border-radius: 10px;
+    border: 2px solid var(--cartoon-border-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb); /* Use theme var */
+    border-radius: 8px;
+    border: 2px solid var(--cartoon-border-dark);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover); /* Use theme var */
 }
 
-header {
-    font-family: 'Funnel Display', sans-serif;
+a {
+    color: var(--text-link); /* Use theme var */
+    font-weight: 700;
+    text-decoration: none;
+}
+a:hover {
+    color: color-mix(in srgb, var(--text-link) 80%, black);
+    text-decoration: underline;
 }
 
+/* Error Message Styling */
+.error-message {
+    padding: 0.75rem 1rem; margin-bottom: 1rem;
+    color: var(--cartoon-secondary); /* [cite: 49] */
+    background-color: color-mix(in srgb, var(--cartoon-secondary) 15%, white); /* Lighter red from var */
+    border: 2.5px solid var(--cartoon-secondary); /* [cite: 49] */
+    box-shadow: 3px 3px 0px var(--cartoon-secondary); /* [cite: 49] */
+    border-radius: 12px; /* [cite: 49] */
+    font-weight: 700; /* [cite: 49] */
+    font-family: var(--cartoon-font);
+}
+html.dark .error-message {
+    background-color: color-mix(in srgb, var(--cartoon-secondary) 25%, var(--cartoon-dm-bg-main) 75%); /* Darker, muted red bg */
+    color: color-mix(in srgb, var(--cartoon-secondary) 80%, white); /* Brighter text for dark bg */
+}
 

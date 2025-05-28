@@ -1,60 +1,55 @@
 // src/components/SplashScreen.js
 import React, { useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useTheme } from '../context/ThemeContext'; // To get theme colors
+// Removed useTheme as we are standardizing to a single cartoon theme for the splash
+// import { useTheme } from '../context/ThemeContext';
 
 const SplashScreen = () => {
   const canvasRef = useRef(null);
-  const { theme } = useTheme(); // 'light' or 'dark'
+  // const { theme } = useTheme(); // No longer needed for cartoon style
 
-  // Define color palettes based on the theme
-  // These are example RGBA values; adjust them to precisely match or complement your CSS variables.
-  const lineColorsLight = [
-    'rgba(37, 99, 235, 0.6)',   // Equivalent to blue-600 from Tailwind
-    'rgba(29, 78, 216, 0.5)',   // Equivalent to blue-700
-    'rgba(96, 165, 250, 0.4)',  // Equivalent to blue-400
-    'rgba(129, 140, 248, 0.5)', // Equivalent to indigo-400
-    'rgba(165, 180, 252, 0.4)', // Equivalent to indigo-300
+  // Define cartoon color palette for animated lines
+  const lineColorsCartoon = [
+    'rgba(0, 174, 239, 0.6)',   // --cartoon-primary with alpha
+    'rgba(255, 107, 107, 0.5)', // --cartoon-secondary with alpha
+    'rgba(255, 209, 102, 0.5)', // --cartoon-accent with alpha
+    'rgba(6, 214, 160, 0.4)',   // --cartoon-green with alpha
+    'rgba(0, 174, 239, 0.3)',   // Lighter --cartoon-primary
   ];
-  const lineColorsDark = [
-    'rgba(96, 165, 250, 0.6)',  // Equivalent to blue-400
-    'rgba(59, 130, 246, 0.5)',  // Equivalent to blue-500
-    'rgba(129, 140, 248, 0.5)', // Equivalent to indigo-400
-    'rgba(165, 180, 252, 0.4)', // Equivalent to indigo-300
-    'rgba(199, 210, 254, 0.3)', // Equivalent to indigo-200
-  ];
-  const currentLineColors = theme === 'dark' ? lineColorsDark : lineColorsLight;
-  // Use direct hex values if you know them, or retrieve from CSS variables if needed for exact match
-  // For title, directly using CSS var in style prop is better if possible, or useTheme to pass down actual values
-  const titleActualColor = theme === 'dark' ? 'var(--text-heading)' : 'var(--text-heading)';
+  // const currentLineColors = theme === 'dark' ? lineColorsDark : lineColorsLight; // Replaced by single cartoon theme
+
+  // Colors for title elements
+  const titleTaskMDColor = 'var(--cartoon-primary)';
+  const titleProColor = 'var(--cartoon-accent)';
+  const taglineColor = 'var(--cartoon-text)';
 
 
   const draw = useCallback((ctx, frameCount) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    const numLines = 25; // Number of flowing lines
-    const maxAmplitude = ctx.canvas.height / 7; // Adjusted amplitude
-    const time = frameCount * 0.004; // Slightly adjusted time progression
+    const numLines = 25;
+    const maxAmplitude = ctx.canvas.height / 7;
+    const time = frameCount * 0.004;
 
     for (let i = 0; i < numLines; i++) {
       ctx.beginPath();
-      ctx.lineWidth = 1 + Math.random() * 1.0; // Slightly thinner lines
-      ctx.strokeStyle = currentLineColors[i % currentLineColors.length];
+      ctx.lineWidth = 1.5 + Math.random() * 1.0; // Slightly thicker for cartoon feel
+      ctx.strokeStyle = lineColorsCartoon[i % lineColorsCartoon.length];
 
-      const freq = 0.008 + (i * 0.0015); // Adjusted frequency
-      const amp = maxAmplitude * (0.4 + Math.sin(time * 0.5 + i * 0.3) * 0.3); // More dynamic amplitude
-      const yOffset = ctx.canvas.height / 2 + Math.sin(i * 0.15 + time * 0.6) * (ctx.canvas.height / 5); // Adjusted vertical oscillation
+      const freq = 0.008 + (i * 0.0015);
+      const amp = maxAmplitude * (0.4 + Math.sin(time * 0.5 + i * 0.3) * 0.3);
+      const yOffset = ctx.canvas.height / 2 + Math.sin(i * 0.15 + time * 0.6) * (ctx.canvas.height / 5);
       const phaseShift = i * 0.4;
-      const speed = 0.4 + (i % 6) * 0.12; // Adjusted speed
+      const speed = 0.4 + (i % 6) * 0.12;
 
       ctx.moveTo(0, yOffset + Math.sin(time * speed + phaseShift) * amp);
-      for (let x = 0; x < ctx.canvas.width + 10; x += 10) { // Draw slightly beyond width for smoother edges
-        const yNoise = (Math.random() - 0.2) * 2; // Tiny bit of random y-jitter for organic feel
+      for (let x = 0; x < ctx.canvas.width + 10; x += 10) {
+        const yNoise = (Math.random() - 0.2) * 2;
         const y = yOffset + Math.sin(x * freq + time * speed + phaseShift) * amp * Math.cos(x / (150 + i*12) + time * 1.5) + yNoise;
         ctx.lineTo(x, y);
       }
       ctx.stroke();
     }
-  }, [currentLineColors]); // Recreate draw if colors change (theme change)
+  }, [lineColorsCartoon]); // Dependency updated
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -66,73 +61,74 @@ const SplashScreen = () => {
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      // No need to redraw immediately on resize, render loop will handle it
     };
 
     const render = () => {
       frameCount++;
-      if (canvasRef.current) { // Check if canvas still mounted
+      if (canvasRef.current) {
         draw(context, frameCount);
       }
       animationFrameId = window.requestAnimationFrame(render);
     };
 
-    resizeCanvas(); // Initial size
+    resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    render(); // Start animation
+    render();
 
     return () => {
       window.cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, [draw]); // Effect depends on the draw function
+  }, [draw]);
 
   const splashContainerVariants = {
-    hidden: { opacity: 1 }, // Start fully visible (or 0 if App.js handles initial as 'hidden')
-    visible: { opacity: 1, transition: { duration: 1.2 } }, // Quick fade in if needed
-    exit: { // Define the exit animation for smoother ease-out
+    hidden: { opacity: 1 }, // Starts visible, children animate in
+    visible: { opacity: 1, transition: { duration: 1.2 } },
+    exit: {
       opacity: 0,
       transition: {
-        duration: 1.2, // Duration of the fade out
-        ease: "easeInOut" // Smoother easing
+        duration: 1.2,
+        ease: "easeInOut"
       }
     }
   };
 
   const titleVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 25, scale: 0.9 },
     visible: {
       opacity: 1,
       y: 0,
+      scale: 1,
       transition: {
-        delay: 0.5,
-        duration: 2.0,
-        ease: "easeOut"
+        delay: 0.4,
+        duration: 1.8,
+        ease: "easeOut" // Reverted to "easeOut" to fix TypeError
       }
     }
   };
   
   const proVariants = {
-    hidden: { opacity: 0, x: -10 },
+    hidden: { opacity: 0, x: -15, scale: 0.9 },
     visible: {
       opacity: 1,
       x: 0,
+      scale: 1,
       transition: {
-        delay: 0.9, 
-        duration: 2.5,
-        ease: "easeOut"
+        delay: 0.7,
+        duration: 2.0,
+        ease: "easeOut" // Reverted to "easeOut" to fix TypeError
       }
     }
   };
 
   const taglineVariants = {
-    hidden: { opacity: 0, y: 10 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        delay: 1.2,
-        duration: 2.0,
+        delay: 1.0,
+        duration: 1.8,
         ease: "easeOut"
       }
     }
@@ -141,36 +137,41 @@ const SplashScreen = () => {
 
   return (
     <motion.div
-      key="splash-screen-container" // Key for AnimatePresence
+      key="splash-screen-container"
       variants={splashContainerVariants}
-      initial="hidden"   // Start with opacity 0 if App.js doesn't control initial via AnimatePresence's first render
-      animate="visible" // Animate to visible state
-      exit="exit"       // Use the defined exit animation
+      initial="hidden"
+      animate="visible"
+      exit="exit"
       className="splash-screen fixed inset-0 z-[10000] flex flex-col items-center justify-center"
-      style={{ backgroundColor: 'var(--bg-primary)' }} // Theme-aware background
+      // Using cartoon background color and font
+      style={{ backgroundColor: 'var(--cartoon-bg-light)', fontFamily: 'var(--cartoon-font)' }}
     >
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-70 dark:opacity-50" /> {/* Added opacity to canvas */}
+      {/* Adjusted canvas opacity for cartoon theme */}
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-50" />
       <motion.div
         className="relative z-10 text-center select-none"
-        initial="hidden" // Children animate from their own 'hidden' state
-        animate="visible" // Trigger children's 'visible' state
+        initial="hidden"
+        animate="visible"
       >
         <motion.h1
           variants={titleVariants}
-          className="text-6xl md:text-8xl font-bold font-header tracking-tight"
-          style={{ color: titleActualColor }}
+          // Using font-extrabold for 800 weight, tracking-tight for style
+          className="text-6xl md:text-8xl font-extrabold tracking-tight"
+          style={{ color: titleTaskMDColor }} // Applied cartoon primary color
         >
           TaskMD
           <motion.span 
             variants={proVariants}
-            className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400 dark:from-blue-400 dark:to-indigo-300"
+            // Removed gradient, using solid cartoon accent color
+            style={{ color: titleProColor, marginLeft: '0.1em' }} // Added slight margin for "Pro"
           >
             Pro
           </motion.span>
         </motion.h1>
         <motion.p
-            variants={taglineVariants} // Using new variants for tagline
-            className="text-lg md:text-xl text-[var(--text-secondary)] mt-4"
+            variants={taglineVariants}
+            className="text-lg md:text-xl mt-5" // Adjusted margin-top
+            style={{ color: taglineColor, fontWeight: 600 }} // Using cartoon text color and semi-bold
         >
             Transform Your Markdown. Master Your Tasks.
         </motion.p>

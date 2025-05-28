@@ -34,7 +34,7 @@ function App() {
     initializeConfetti();
     const splashTimer = setTimeout(() => {
       setShowSplash(false);
-    }, 4200);
+    }, 4200); // Assuming splash screen duration is intentional
 
     return () => clearTimeout(splashTimer);
   }, []);
@@ -73,11 +73,12 @@ function App() {
             />
         </Suspense>
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-150px)] p-4 text-center">
-          <h1 className="text-2xl font-bold mb-4 text-text-primary">No Boards Available</h1>
+          {/* Updated font-bold to font-extrabold for h1 */}
+          <h1 className="text-2xl font-extrabold mb-4 text-text-primary">No Boards Available</h1>
           <p className="mb-6 text-text-secondary">Create a new board to get started.</p>
           <button
             onClick={() => actions.addBoard(DEFAULT_BOARD_NAME)}
-            className="btn btn-primary px-6 py-3 text-base"
+            className="btn btn-primary px-6 py-3 text-base" // Styles from index.css will apply
           >
             + Create Default Board
           </button>

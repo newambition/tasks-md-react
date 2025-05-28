@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# State Management Overview
+
+This application primarily uses React's built-in state management capabilities (Hooks, Context API) and a reducer pattern for managing the Kanban board data.
+
+## Key Components & Files:
+
+*   **`useKanbanManager` Hook (`[src/hooks/useKanbanManager.js](mdc:src/src/hooks/useKanbanManager.js)`)**: This is the central hook for managing all Kanban board logic. It encapsulates the reducer, actions, and derived state.
+*   **Reducer (`[src/store/reducer.js](mdc:src/src/store/reducer.js)`)**: Contains the `kanbanReducer` function that handles state transitions based on dispatched actions.
+*   **Initial State (`[src/store/initialState.js](mdc:src/src/store/initialState.js)`)**: Defines the initial structure of the application state, including loading from local storage and setting up default board/phases if necessary.
+*   **Action Types (`[src/store/actionTypes.js](mdc:src/src/store/actionTypes.js)`)**: Defines constants for all the actions that can be dispatched to the reducer.
+*   **Local Storage**: The application state is persisted to local storage using the key defined in `[src/constants.js](mdc:src/src/constants.js)` (`KANBAN_DATA_STORAGE_KEY`).
+*   **Theme Context (`[src/context/ThemeContext.js](mdc:src/src/context/ThemeContext.js)`)**: Manages the application's theme (light/dark) and persists it to local storage.
+
+## Data Flow:
+
+1.  The `[src/App.js](mdc:src/src/App.js)` component calls the `useKanbanManager` hook to get the current state and action dispatchers.
+2.  User interactions in components (e.g., `[src/components/Header.js](mdc:src/src/components/Header.js)`, `[src/components/KanbanBoard.js](mdc:src/src/components/KanbanBoard.js)`) trigger action dispatchers from `useKanbanManager`.
+3.  The `kanbanReducer` updates the state based on the dispatched action.
+4.  The `useKanbanManager` hook provides the updated state to the components, causing a re-render.
+5.  The `useEffect` hook in `useKanbanManager` saves the state to local storage whenever it changes.

@@ -1,0 +1,20 @@
+// src/store/actionTypes.js
+
+export const LOAD_INITIAL_DATA = 'LOAD_INITIAL_DATA';
+export const SET_STATE_FROM_LOCALSTORAGE = 'SET_STATE_FROM_LOCALSTORAGE';
+
+export const ADD_BOARD = 'ADD_BOARD';
+export const SELECT_BOARD = 'SELECT_BOARD';
+export const RENAME_BOARD = 'RENAME_BOARD';
+export const DELETE_BOARD = 'DELETE_BOARD';
+export const LOAD_MARKDOWN_DATA = 'LOAD_MARKDOWN_DATA';
+
+export const ADD_PHASE = 'ADD_PHASE';
+export const SELECT_PHASE = 'SELECT_PHASE';
+export const RENAME_PHASE = 'RENAME_PHASE';
+export const DELETE_PHASE = 'DELETE_PHASE';
+
+export const SET_TASKS_FOR_ACTIVE_BOARD = 'SET_TASKS_FOR_ACTIVE_BOARD';
+export const ADD_TASK_TO_COLUMN = 'ADD_TASK_TO_COLUMN';
+export const DELETE_TASK = 'DELETE_TASK';
+export const UPDATE_TASK_DUE_DATE = 'UPDATE_TASK_DUE_DATE';

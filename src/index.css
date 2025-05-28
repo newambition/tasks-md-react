@@ -1,13 +1,198 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Base Styles --- */
+:root {
+    --bg-primary: #fafcff; /* gray-100 */
+    --bg-secondary: white;
+    --bg-tertiary: #f9fafb; /* gray-50 */
+    --text-primary: #1f2937; /* gray-800 */
+    --text-secondary: #4b5563; /* gray-600 */
+    --text-muted: #6b7280; /* gray-500 */
+    --text-heading: #1d4ed8; /* gray-900 */
+    --text-inverted: white;
+    --text-link: #1d4ed8; /* blue-700 */
+    --border-color: #dde3eb; /* gray-300 */
+    --border-card: #ced1d6; /* gray-200 */
+    --input-bg: white;
+    --input-border: #d1d5db; /* gray-300 */
+    --button-primary-bg: #2563eb; /* blue-600 */
+    --button-primary-hover-bg: #1d4ed8; /* blue-700 */
+    --button-secondary-bg: #e0e7ff; /* indigo-100 */
+    --button-secondary-hover-bg: #c7d2fe; /* indigo-200 */
+    --button-secondary-text: #1d4ed8; /* blue-700 */
+    --header-todo-bg: #f97316; /* orange-500 */
+    --header-inprogress-bg: #3b82f6; /* blue-500 */
+    --header-done-bg: #22c55e; /* green-500 */
+    --delete-btn-text: #9ca3af; /* gray-400 */
+    --delete-btn-hover-text: #ef4444; /* red-500 */
+    --delete-btn-hover-bg: #fee2e2; /* red-100 */
+    --overdue-text: #dc2626; /* red-600 */
+    --overdue-icon: #ef4444; /* red-500 */
+    --drag-over-bg: #eff6ff; /* blue-50 */
+    --drag-over-outline: #93c5fd; /* blue-300 */
+    --scrollbar-track: #e5e7eb; /* gray-200 */
+    --scrollbar-thumb: #a1a1aa; /* zinc-400 */
+    --scrollbar-thumb-hover: #71717a; /* zinc-500 */
+    color-scheme: light;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+html.dark {
+    --bg-primary: #111827; /* gray-900 */
+    --bg-secondary: #1f2937; /* gray-800 */
+    --bg-tertiary: #374151; /* gray-700 */
+    --text-primary: #d1d5db; /* gray-300 */
+    --text-secondary: #9ca3af; /* gray-400 */
+    --text-muted: #6b7280; /* gray-500 */
+    --text-heading: #a5b4fc; /* gray-50 */
+    --text-inverted: #1f2937; /* gray-800 */
+    --text-link: #60a5fa; /* blue-400 */
+    --border-color: #4b5563; /* gray-600 */
+    --border-card: #4b5563; /* gray-600 */
+    --input-bg: #374151; /* gray-700 */
+    --input-border: #4b5563; /* gray-600 */
+    --button-primary-bg: #3b82f6; /* blue-500 */
+    --button-primary-hover-bg: #60a5fa; /* blue-400 */
+    --button-secondary-bg: #312e81; /* indigo-900 */
+    --button-secondary-hover-bg: #3730a3; /* indigo-800 */
+    --button-secondary-text: #a5b4fc; /* indigo-300 */
+    /* Headers look ok with dark text on light bg, or use same colors? Using same for now */
+    /* --header-todo-bg: #f97316; */
+    /* --header-inprogress-bg: #3b82f6; */
+    /* --header-done-bg: #22c55e; */
+    --delete-btn-text: #9ca3af; /* gray-400 */
+    --delete-btn-hover-text: #fda4af; /* red-300 */
+    --delete-btn-hover-bg: #4b5563; /* gray-600 */
+    --overdue-text: #f87171; /* red-400 */
+    --overdue-icon: #fca5a5; /* red-300 */
+    --drag-over-bg: #1e3a8a; /* blue-900 */
+    --drag-over-outline: #3b82f6; /* blue-500 */
+    --scrollbar-track: #1f2937; /* gray-800 */
+    --scrollbar-thumb: #4b5563; /* gray-600 */
+    --scrollbar-thumb-hover: #6b7280; /* gray-500 */
+     color-scheme: dark;
 }
+
+/* Apply base body styles using CSS variables */
+body {
+    @apply font-sans flex flex-col min-h-screen transition-colors duration-300 ease-in-out;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Button Base Styles (Can be applied with @apply or used as global classes) */
+.btn {
+    @apply px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ease-in-out;
+}
+.btn-primary {
+    @apply text-white focus:ring-blue-500;
+    background-color: var(--button-primary-bg);
+}
+.btn-primary:hover {
+    background-color: var(--button-primary-hover-bg);
+}
+.btn-primary:active {
+     @apply transform scale-[0.97];
+}
+
+.btn-secondary {
+    @apply border border-transparent focus:ring-indigo-500;
+    color: var(--button-secondary-text);
+    background-color: var(--button-secondary-bg);
+}
+.btn-secondary:hover {
+    background-color: var(--button-secondary-hover-bg);
+}
+.btn-secondary:active {
+     @apply transform scale-[0.96];
+}
+
+/* Styled Select (Replicates original CSS) */
+.styled-select {
+    @apply text-sm font-medium rounded-md border border-solid cursor-pointer transition-all duration-200 ease-in-out;
+    padding: 0.3rem 1.75rem 0.3rem 0.75rem; /* Adjusted padding 
+    color: var(--button-secondary-text);
+    background-color: var(--button-secondary-bg);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%231d4ed8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); /* Light mode arrow 
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    -webkit-appearance: none;
+    appearance: none; 
+
+.styled-select:hover {
+    background-color: var(--button-secondary-hover-bg);
+}
+.styled-select:focus {
+    @apply outline-none ring-2 ring-offset-0 ring-blue-500; /* Adjusted focus ring */
+    border-color: var(--input-border); /* Keep border consistent on focus */
+}
+
+/* Input Base Styles */
+.input-base {
+    @apply text-sm rounded-md border p-2 transition-colors duration-300 ease-in-out;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border-color: var(--input-border);
+    color-scheme: var(--color-scheme); /* For date input */
+}
+.input-base::placeholder {
+    color: var(--text-muted);
+}
+.input-base:focus {
+    @apply outline-none ring-2 ring-blue-500 border-blue-500;
+}
+
+/* Action Button (for edit/delete/theme icons) */
+.action-btn {
+    @apply p-1 rounded text-lg leading-none transition-colors duration-200 ease-in-out;
+    color: var(--text-muted);
+}
+.action-btn:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+.action-btn-delete:hover {
+    color: var(--delete-btn-hover-text);
+    background-color: var(--delete-btn-hover-bg);
+}
+
+/* Kanban Column Styles */
+.kanban-column {
+    @apply min-h-[600px] max-h-[800px] my-4 rounded-lg shadow-md border border-border-color flex flex-col overflow-hidden transition-colors duration-300 ease-in-out;
+    background-color: var(--bg-tertiary);
+}
+.kanban-header {
+    @apply font-semibold p-3 text-center transition-colors duration-300 ease-in-out;
+    color: var(--text-inverted); /* Inverted text for headers */
+}
+.header-todo { background-color: var(--header-todo-bg); }
+.header-inprogress { background-color: var(--header-inprogress-bg); }
+.header-done { background-color: var(--header-done-bg); }
+
+.task-list-container {
+    @apply p-4 flex-grow overflow-y-auto; /* Ensure container grows and scrolls */
+}
+.task-list {
+    @apply space-y-3;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar { width: 0px; height: 0px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+/* Add Inter font (if not already included by CRA/Tailwind defaults) */
+@import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+header {
+    font-family: 'Funnel Display', sans-serif;
+}
+
+

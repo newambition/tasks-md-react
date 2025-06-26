@@ -1,7 +1,7 @@
 // src/components/InfoModal.js
-import React from 'react'; // Ensure React is imported
+import React from "react"; // Ensure React is imported
 
-const exampleMarkdown = `# My Project Plan\nSome introductory text.\n\n## Phase 1: Kickoff\n- [ ] Schedule kickoff meeting (2025-05-10)\n- [x] Prepare agenda (2025-05-09)\n\n## Phase 2: Research\n- [ ] User interviews\n- [ ] Competitor analysis (2025-05-20)\n`;
+const exampleMarkdown = `# My Project Plan\nSome introductory text.\n\n## Phase 1: Kickoff\n- [ ] Schedule kickoff meeting (10-05-25)\n- [x] Prepare agenda (09-05-25)\n\n## Phase 2: Research\n- [ ] User interviews\n- [ ] Competitor analysis (20-05-25) [review(#06d6a0)]\n`;
 
 // Wrap component with React.memo
 const InfoModal = React.memo(({ open, onClose }) => {
@@ -11,12 +11,15 @@ const InfoModal = React.memo(({ open, onClose }) => {
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-opacity duration-300 ease-in-out animate-fadeIn"
       onClick={onClose}
       // Cartoon-style overlay background
-      style={{ backgroundColor: 'rgba(51, 58, 122, 0.4)', fontFamily: 'var(--cartoon-font)' }}
+      style={{
+        backgroundColor: "rgba(51, 58, 122, 0.4)",
+        fontFamily: "var(--cartoon-font)",
+      }}
     >
       <div
         // Cartoon-style modal panel (popup bubble)
         className="bg-white w-full max-w-lg mx-auto p-6 relative rounded-[15px] border-[3px] border-solid border-cartoon-border-dark shadow-[5px_5px_0px_var(--cartoon-shadow-color)] animate-fadeIn"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <button
           // Cartoon-style circular action button for close
@@ -26,32 +29,85 @@ const InfoModal = React.memo(({ open, onClose }) => {
         >
           <span className="text-xl font-bold leading-none">&times;</span>
         </button>
-        <h2 
+        <h2
           className="text-xl font-extrabold mb-4 pb-3 border-b-2"
-          style={{ color: 'var(--cartoon-primary)', borderColor: 'var(--cartoon-border-medium)'}}
+          style={{
+            color: "var(--cartoon-primary)",
+            borderColor: "var(--cartoon-border-medium)",
+          }}
         >
           How to Use Tasks.md Kanban
         </h2>
-        <p className="mb-4 text-sm" style={{ color: 'var(--cartoon-text)'}}>
-          You can use this Kanban board manually, or by uploading a <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">.md</span> tasklist in GitHub tasks format—with the addition of <b>phases</b>.
+        <p className="mb-4 text-sm" style={{ color: "var(--cartoon-text)" }}>
+          You can use this Kanban board manually, or by uploading a{" "}
+          <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
+            .md
+          </span>{" "}
+          tasklist in GitHub tasks format—with the addition of <b>phases</b>.
         </p>
-        <p className="mb-2 text-sm font-semibold" style={{ color: 'var(--cartoon-text)'}}>Example Markdown:</p>
-        <pre 
+        <p
+          className="mb-2 text-sm font-semibold"
+          style={{ color: "var(--cartoon-text)" }}
+        >
+          Example Markdown:
+        </p>
+        <pre
           className="text-xs rounded-xl p-3.5 overflow-x-auto mb-4 border-2 whitespace-pre-wrap"
           style={{
-            backgroundColor: 'var(--cartoon-bg-medium)',
-            borderColor: 'var(--cartoon-border-dark)',
-            boxShadow: 'inset 2px 2px 0px var(--cartoon-border-medium), 2px 2px 0px var(--cartoon-shadow-color)',
-            color: 'var(--cartoon-text)'
+            backgroundColor: "var(--cartoon-bg-medium)",
+            borderColor: "var(--cartoon-border-dark)",
+            boxShadow:
+              "inset 2px 2px 0px var(--cartoon-border-medium), 2px 2px 0px var(--cartoon-shadow-color)",
+            color: "var(--cartoon-text)",
           }}
         >
-{exampleMarkdown}
+          {exampleMarkdown}
         </pre>
-        <ul className="list-disc pl-5 text-sm space-y-1 mb-3" style={{ color: 'var(--cartoon-text)'}}>
-          <li><span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">##</span> headings become <b>phases</b></li>
-          <li><span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">- [ ]</span> and <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">- [x]</span> lines become <b>tasks</b></li>
+        <ul
+          className="list-disc pl-5 text-sm space-y-1 mb-3"
+          style={{ color: "var(--cartoon-text)" }}
+        >
+          <li>
+            <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
+              #
+            </span>{" "}
+            Level 1 headings become <b>boards</b>
+          </li>
+          <li>
+            <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
+              ##
+            </span>{" "}
+            Level 2 headings become <b>phases</b>
+          </li>
+          <li>
+            <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
+              - [ ]
+            </span>{" "}
+            and{" "}
+            <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
+              - [x]
+            </span>{" "}
+            lines become <b>tasks</b>
+          </li>
+          <li>
+            <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
+              (DD-MM-YY)
+            </span>{" "}
+            become <b>due dates</b>
+          </li>
+          <li>
+            <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
+              [label(#color)]
+            </span>{" "}
+            become <b>labels</b> with color being optional
+          </li>
         </ul>
-        <p className="text-xs mt-3" style={{ color: 'var(--cartoon-border-medium)'}}>Dates in parentheses are optional and will be parsed as due dates.</p>
+        <p
+          className="text-xs mt-3"
+          style={{ color: "var(--cartoon-border-medium)" }}
+        >
+          Only tasks are required to populate the board, the rest is optional.
+        </p>
       </div>
     </div>
   );

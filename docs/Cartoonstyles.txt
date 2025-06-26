@@ -1,0 +1,193 @@
+
+# Cartoon Style Design Instructions
+
+This document outlines the styling principles used to achieve the "cartoon" aesthetic in the Interactive Map Explorer application. The goal is a vibrant, playful, and friendly user interface with a distinct 2.5D "pop-out" feel.
+
+## I. Core Styling Principles
+
+### 1. Color Palette (CSS Variables)
+
+The theme relies heavily on a defined set of CSS variables for consistency:
+
+-   `--cartoon-font`: 'Nunito', sans-serif (primary font)
+-   `--cartoon-primary`: `#00AEEF` (Bright Sky Blue - for primary actions, titles)
+-   `--cartoon-secondary`: `#FF6B6B` (Playful Coral Red - for highlights, active states, alerts)
+-   `--cartoon-accent`: `#FFD166` (Sunny Yellow - for secondary actions, badges, timeline header)
+-   `--cartoon-green`: `#06D6A0` (Bright Mint Green - for success states, alternative actions, badges)
+-   `--cartoon-text`: `#4A4A4A` (Dark Gray - for body text)
+-   `--cartoon-text-light`: `#ffffff` (White - for text on dark/colored backgrounds)
+-   `--cartoon-bg-light`: `#F5F9FC` (Very Light Blue/Gray - for main backgrounds)
+-   `--cartoon-bg-medium`: `#E0E8EF` (Slightly darker light blue/gray)
+-   `--cartoon-border-dark`: `#333A7A` (Dark Blue/Purple - for all outlines and key shadow elements)
+-   `--cartoon-border-medium`: `#A0AEC0` (Medium Gray - for inactive states, placeholders)
+-   `--cartoon-border-light`: `#CAD5E0` (Light Gray - for subtle borders)
+-   `--cartoon-shadow-color`: `rgba(51, 58, 122, 0.4)` (Shadow color derived from `--cartoon-border-dark` - for the "pop-out" effect)
+
+### 2. Typography
+
+-   **Font Family**: `Nunito` (imported from Google Fonts) is used throughout for its rounded and friendly appearance. System fonts are used as fallbacks.
+-   **Weights**:
+    -   `400` (Regular) for body text, descriptions.
+    *   `600` (Semi-bold) for input text, some labels.
+    *   `700` (Bold) for button text, some titles, labels.
+    *   `800` (Extra-bold) for main titles, card titles.
+
+### 3. Borders
+
+-   **Style**: `solid`
+-   **Thickness**: Generally thick, ranging from `2px` to `5px`. Most interactive elements use `2.5px` or `3px`.
+-   **Color**: Predominantly `var(--cartoon-border-dark)` to provide strong definition.
+-   **Rounded Corners (`border-radius`)**: Generously applied to most elements (e.g., `10px`, `12px`, `15px`, `20px`, `30px`, `50%` for circular items) to enhance the soft, cartoon feel.
+
+### 4. Shadows ("Pop-Out" Effect)
+
+-   A key characteristic of the cartoon style is the `box-shadow` that creates a 2.5D or "pop-out" effect.
+-   **Format**: `Xpx Ypx 0px var(--cartoon-shadow-color)` or `Xpx Ypx 0px var(--cartoon-border-dark)`.
+    -   Example: `box-shadow: 4px 4px 0px var(--cartoon-shadow-color);`
+-   This shadow is typically offset downwards and to the right, with no blur, giving a layered appearance.
+-   Shadows often change on hover/active states (e.g., reducing offset or changing color).
+
+### 5. Interactions (Hover, Active, Focus)
+
+-   **Transformations**: Slight `translate(x, y)` and sometimes `rotate()` or `scale()` on hover to make elements feel dynamic and responsive.
+-   **Shadow Changes**: Shadows often become slightly smaller or change color on interaction to simulate being "pressed."
+-   **Background/Border Color Changes**: Standard practice for indicating active or focused states.
+
+## II. Specific UI Element Styling
+
+### 1. Buttons
+
+-   **General Shape**: Rounded corners (e.g., `10px` for rectangular, `50%` for circular).
+-   **Background**: Solid, using theme colors (`--cartoon-primary`, `--cartoon-accent`, `--cartoon-green`).
+-   **Text**: `var(--cartoon-text-light)` or `var(--cartoon-border-dark)`, typically `font-weight: 700`.
+-   **Border**: `2px` to `3px solid var(--cartoon-border-dark)`.
+-   **Shadow**: `2px 2px 0px var(--cartoon-border-dark)` or `var(--cartoon-shadow-color)`.
+-   **Hover/Active**:
+    -   Slight color darken.
+    -   `transform: translate(1px, 1px);` or `transform: translate(1.5px, 1.5px);`
+    -   Reduced shadow offset (e.g., `box-shadow: 1px 1px 0px var(--cartoon-border-dark);`).
+    -   Active states often use `transform: translate(2px, 2px); box-shadow: none;` or an inset shadow.
+
+    *   **Examples**:
+        *   `.search-button`: Circular, `--cartoon-primary` background.
+        *   `.reset-button`: Circular, `--cartoon-green` background.
+        *   `.carousel-arrow`: Circular, `--cartoon-accent` background.
+        *   `.timeline-actions button`: Rectangular, `--cartoon-primary` background.
+
+### 2. Cards (e.g., `.location-card`)
+
+-   **Background**: `white`.
+-   **Border**: `3px solid var(--cartoon-border-dark)`.
+-   **Shadow**: `4px 4px 0px var(--cartoon-shadow-color)`.
+-   **Rounded Corners**: `border-radius: 20px`.
+-   **Hover**: `transform: translate(-3px, -3px) rotate(-1deg); box-shadow: 7px 7px 0px var(--cartoon-shadow-color);`
+-   **Active State (`.card-active`)**:
+    -   `border: 3px solid var(--cartoon-secondary);`
+    -   `box-shadow: 4px 4px 0px var(--cartoon-secondary) !important;`
+    -   `transform: scale(1.02) rotate(0.5deg) !important;`
+-   **Image (`.card-image`)**:
+    -   `height: 140px;`
+    -   `border-bottom: 3px solid var(--cartoon-border-dark);`
+    -   `border-radius: 17px 17px 0 0;` (to match card's top rounding).
+    -   Placeholder SVGs use bright, flat colors and a bold initial letter.
+-   **Title (`.card-title`)**: `var(--cartoon-primary)`, `font-weight: 800`.
+
+### 3. Text Inputs & Search Bar
+
+-   **Container (`.search-bar`)**:
+    -   `background-color: white;`
+    -   `border-radius: 30px;` (highly rounded)
+    -   `border: 3px solid var(--cartoon-border-dark);`
+    -   `box-shadow: 4px 4px 0px var(--cartoon-shadow-color);`
+    -   Focus (`:focus-within`): `box-shadow: 6px 6px 0px var(--cartoon-shadow-color);`
+-   **Input Field (`#prompt-input`)**:
+    -   `border: none; outline: none; background: transparent;`
+    -   `font-family: var(--cartoon-font); font-weight: 600;`
+    -   `color: var(--cartoon-text);`
+    -   `::placeholder`: `color: var(--cartoon-border-medium);`
+-   **Search Icon (`.search-icon`)**: `color: var(--cartoon-primary);`
+
+### 4. Toggles (e.g., Mode Toggle `.mode-toggle`)
+
+-   **Container (`.mode-toggle`)**:
+    -   `background: rgba(255, 255, 255, 0.7);`
+    -   `border: 2px solid var(--cartoon-border-dark);`
+    -   `box-shadow: 3px 3px 0px var(--cartoon-shadow-color);`
+    -   `border-radius: 30px;`
+-   **Switch Track (`.slider`)**:
+    -   `border-radius: 34px;`
+    -   `border: 2px solid var(--cartoon-border-dark);`
+    -   Unchecked: `background-color: var(--cartoon-border-medium);`
+    -   Checked: `background-color: var(--cartoon-secondary);`
+-   **Switch Thumb (`.slider:before`)**:
+    -   `background-color: white;`
+    -   `border: 1px solid var(--cartoon-border-dark);`
+    -   `border-radius: 50%;`
+
+### 5. Popups (Map Popups - `.popup-bubble`)
+
+-   **Background**: `white`.
+-   **Border**: `3px solid var(--cartoon-border-dark)`.
+-   **Shadow**: `5px 5px 0px var(--cartoon-shadow-color)`.
+-   **Rounded Corners**: `border-radius: 15px`.
+-   **Title (`<b>`)**: `color: var(--cartoon-primary); font-weight: 800;`
+-   **Active State (`.popup-active`)**: `border-color: var(--cartoon-secondary); box-shadow: 5px 5px 0px var(--cartoon-secondary);`
+
+### 6. Timeline
+
+-   **Container (`.timeline-container`)**:
+    -   `background-color: var(--cartoon-bg-light);`
+    -   `border-left: 3px solid var(--cartoon-border-dark);`
+    -   `box-shadow: -4px 0px 0px var(--cartoon-shadow-color);`
+-   **Header (`.timeline-header`)**:
+    -   `background-color: var(--cartoon-accent);`
+    -   `border-bottom: 3px solid var(--cartoon-border-dark);`
+    -   `color: var(--cartoon-border-dark);`
+-   **Item Content (`.timeline-content`)**:
+    -   `background-color: white;`
+    -   `border: 2.5px solid var(--cartoon-border-dark);`
+    -   `box-shadow: 4px 4px 0px var(--cartoon-shadow-color);`
+    -   `border-radius: 12px;`
+    -   Hover: `transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--cartoon-shadow-color);`
+    -   Active: `border-left: 5px solid var(--cartoon-secondary); box-shadow: 4px 4px 0px var(--cartoon-secondary);`
+-   **Dot (`.timeline-dot`)**: `width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--cartoon-border-dark); background-color: var(--cartoon-primary);` (or `--cartoon-green` for transport).
+-   **Line (`.timeline-line`)**: `width: 4px; background-color: var(--cartoon-border-dark);`
+
+### 7. Badges (on Cards & Timeline)
+
+-   **General**:
+    -   `border: 2px solid var(--cartoon-border-dark);`
+    -   `box-shadow: 2px 2px 0px var(--cartoon-shadow-color);`
+    -   `font-weight: 700; color: var(--cartoon-text-light);`
+    -   `border-radius: 20px;`
+-   **Colors**:
+    -   Time (`.card-time-badge`): `background-color: var(--cartoon-accent);`
+    -   Sequence (`.card-sequence-badge`): `background-color: var(--cartoon-secondary);` (often circular)
+    -   Duration (`.card-duration`, `.timeline-duration`): `background-color: var(--cartoon-green);` (Timeline duration uses `--cartoon-accent`).
+
+### 8. Map Container (`#map`)
+
+-   While the map content itself is styled via Google Cloud Console (using a custom Map ID with a cartoon theme), the map's direct container div in the HTML receives a thick border:
+    -   `border: 5px solid var(--cartoon-border-dark);`
+
+### 9. Carousel Elements
+
+-   **Main Container (`.card-container`)**:
+    -   `background-color: rgba(224, 232, 239, 0.8);` (semi-transparent light bg)
+    -   `border: 3px solid var(--cartoon-border-dark);`
+    -   `box-shadow: 0px 6px 0px var(--cartoon-shadow-color);` (bottom shadow for depth)
+    -   `border-radius: 25px;`
+-   **Dots (`.carousel-dot`)**:
+    -   Inactive: `background-color: var(--cartoon-border-light); border: 2px solid var(--cartoon-border-dark);`
+    -   Active: `background-color: var(--cartoon-secondary);`
+
+### 10. Error Messages (`.error`)
+
+-   `color: var(--cartoon-secondary);`
+-   `background-color: #ffebee;` (light red)
+-   `border: 2.5px solid var(--cartoon-secondary);`
+-   `box-shadow: 3px 3px 0px var(--cartoon-secondary);`
+-   `border-radius: 12px; font-weight: 700;`
+
+This guide should provide a comprehensive overview of the cartoon styling. Remember that consistency in applying these principles (especially borders, shadows, and corner rounding) is key to the overall aesthetic.
+    

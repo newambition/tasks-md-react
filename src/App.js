@@ -1,25 +1,32 @@
 // src/App.jsx
-import React, { useEffect, Suspense, lazy, useState } from 'react';
-import { useKanbanManager } from './hooks/useKanbanManager';
-import { initializeConfetti } from './utils/confetti';
-import { DEFAULT_BOARD_NAME } from './constants';
-import SplashScreen from './components/SplashScreen';
-
-const Header = lazy(() => import('./components/Header'));
-const KanbanBoard = lazy(() => import('./components/KanbanBoard'));
+import React, { useEffect, Suspense, lazy, useState, useMemo } from "react";
+import { initializeConfetti } from "./utils/confetti";
+import { DEFAULT_BOARD_NAME } from "./constants";
+import SplashScreen from "./components/SplashScreen";
+import { getDueDateStatus } from "./utils/helpers";
+import { useKanbanManager } from "./hooks/useKanbanManager";
+const Header = lazy(() => import("./components/Header"));
+const KanbanBoard = lazy(() => import("./components/KanbanBoard"));
+const Sidebar = lazy(() => import("./components/Sidebar"));
 
 const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen" style={{backgroundColor: 'var(--bg-primary)'}}>
+  <div
+    className="flex items-center justify-center min-h-screen"
+    style={{ backgroundColor: "var(--bg-primary)" }}
+  >
     {/* Minimal content, or even just the background, to reduce flash */}
   </div>
 );
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLabelIds, setSelectedLabelIds] = useState([]);
+  const [dueDateFilter, setDueDateFilter] = useState(null); // e.g., 'today', 'overdue'
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Sidebar state
   // isAppReady is useful for effects that depend on the main structure being mounted,
   // but not strictly necessary for this fix if conditional rendering is correct.
   // const [isAppReady, setIsAppReady] = useState(false);
-
 
   const {
     state,
@@ -28,13 +35,43 @@ function App() {
     actions,
   } = useKanbanManager();
 
+  const filteredTasks = useMemo(() => {
+    let tasks = tasksForDisplay;
+
+    // Filter by search term
+    if (searchTerm) {
+      tasks = tasks.filter((task) =>
+        task.text.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by selected labels
+    if (selectedLabelIds.length > 0) {
+      tasks = tasks.filter(
+        (task) =>
+          task.labels &&
+          task.labels.some((labelId) => selectedLabelIds.includes(labelId))
+      );
+    }
+
+    // Filter by due date status
+    if (dueDateFilter) {
+      tasks = tasks.filter((task) => {
+        const status = getDueDateStatus(task.dueDate);
+        return status === dueDateFilter;
+      });
+    }
+
+    return tasks;
+  }, [tasksForDisplay, searchTerm, selectedLabelIds, dueDateFilter]);
+
   const { boards, activeBoardId, activePhaseId } = state;
 
   useEffect(() => {
     initializeConfetti();
     const splashTimer = setTimeout(() => {
       setShowSplash(false);
-    }, 4200); // Assuming splash screen duration is intentional
+    }, 3000); // Assuming splash screen duration is intentional
 
     return () => clearTimeout(splashTimer);
   }, []);
@@ -43,11 +80,14 @@ function App() {
   // not just because the 'boards' array reference changed.
   // Adding a check for 'showSplash' ensures it doesn't run prematurely.
   useEffect(() => {
-    if (!showSplash && boards.length > 0 && !boards.some(b => b.id === activeBoardId)) {
+    if (
+      !showSplash &&
+      boards.length > 0 &&
+      !boards.some((b) => b.id === activeBoardId)
+    ) {
       actions.selectBoard(boards[0].id);
     }
   }, [boards, activeBoardId, actions, showSplash]);
-
 
   if (showSplash) {
     return <SplashScreen />;
@@ -59,33 +99,67 @@ function App() {
   if (boards.length === 0) {
     // activeBoard will be null here from useKanbanManager
     return (
-      <> {/* Removed Suspense here as Header isn't the main content causing flashes if no boards */}
-        <canvas id="confetti-canvas" className="fixed inset-0 w-full h-full pointer-events-none z-[5000]"></canvas>
-        {/* Header can be loaded normally or lazy if its initial display here is too slow */}
-        <Suspense fallback={<LoadingFallback/>}> {/* Suspense specifically for Header here if it's heavy */}
-            <Header
-            boards={boards} activeBoard={null} activeBoardPhases={[]} activePhaseId={null}
-            onAddBoard={actions.addBoard} onSelectBoard={actions.selectBoard}
-            onRenameBoard={actions.renameBoard} onDeleteBoard={actions.deleteBoard}
-            onSelectPhase={actions.selectPhase} onLoadMarkdown={actions.loadMarkdownDataToActiveBoard}
-            onAddPhase={actions.addPhaseToActiveBoard} onRenamePhase={actions.renamePhaseOnActiveBoard}
-            onDeletePhase={actions.deletePhaseFromActiveBoard}
-            />
-        </Suspense>
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-150px)] p-4 text-center">
-          {/* Updated font-bold to font-extrabold for h1 */}
-          <h1 className="text-2xl font-extrabold mb-4 text-text-primary">No Boards Available</h1>
-          <p className="mb-6 text-text-secondary">Create a new board to get started.</p>
-          <button
-            onClick={() => actions.addBoard(DEFAULT_BOARD_NAME)}
-            className="btn btn-primary px-6 py-3 text-base" // Styles from index.css will apply
+      <>
+        <canvas
+          id="confetti-canvas"
+          className="fixed inset-0 w-full h-screen pointer-events-none z-[5000]"
+        ></canvas>
+        <div className="flex h-screen">
+          {/* Sidebar */}
+          <Suspense
+            fallback={<div className="w-16 bg-[var(--bg-secondary)]"></div>}
           >
-            + Create Default Board
-          </button>
+            <Sidebar
+              isOpen={sidebarOpen}
+              onToggle={() => setSidebarOpen(!sidebarOpen)}
+              boards={boards}
+              activeBoard={null}
+              activeBoardPhases={[]}
+              activePhaseId={null}
+              onAddBoard={actions.addBoard}
+              onSelectBoard={actions.selectBoard}
+              onRenameBoard={actions.renameBoard}
+              onDeleteBoard={actions.deleteBoard}
+              onSelectPhase={actions.selectPhase}
+              onAddPhase={actions.addPhaseToActiveBoard}
+              onRenamePhase={actions.renamePhaseOnActiveBoard}
+              onDeletePhase={actions.deletePhaseFromActiveBoard}
+            />
+          </Suspense>
+
+          {/* Main Content */}
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <Suspense fallback={<LoadingFallback />}>
+              <Header
+                // Remove board/phase related props - they're now in the sidebar
+                tasks={[]}
+                onLoadMarkdown={actions.loadMarkdownDataToActiveBoard}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                // Filter props
+                boardLabels={[]}
+                selectedLabelIds={selectedLabelIds}
+                onSelectedLabelIdsChange={setSelectedLabelIds}
+                dueDateFilter={dueDateFilter}
+                onDueDateFilterChange={setDueDateFilter}
+              />
+            </Suspense>
+            <div className="flex flex-col items-center justify-center flex-1 p-4 text-center">
+              <h1 className="text-2xl font-extrabold mb-4 text-text-primary">
+                No Boards Available
+              </h1>
+              <p className="mb-6 text-text-secondary">
+                Create a new board to get started.
+              </p>
+              <button
+                onClick={() => actions.addBoard(DEFAULT_BOARD_NAME)}
+                className="btn btn-primary px-6 py-3 text-base"
+              >
+                + Create Default Board
+              </button>
+            </div>
+          </div>
         </div>
-        <footer className="text-center p-4 text-sm text-text-muted mt-auto">
-          TaskMD Pro - Turn your markdown into a kanban board
-        </footer>
       </>
     );
   }
@@ -102,32 +176,72 @@ function App() {
   // Case 3: Boards exist AND activeBoard is resolved and available. Render the main app.
   return (
     <>
-      <canvas id="confetti-canvas" className="fixed inset-0 w-full h-full pointer-events-none z-[5000]"></canvas>
-      <Suspense fallback={<LoadingFallback />}>
-        <Header
-          boards={boards}
-          activeBoard={activeBoard} // Now guaranteed to be an object
-          activeBoardPhases={activeBoard.phases || []} // Safely access phases
-          activePhaseId={activePhaseId}
-          onAddBoard={actions.addBoard} onSelectBoard={actions.selectBoard}
-          onRenameBoard={actions.renameBoard} onDeleteBoard={actions.deleteBoard}
-          onSelectPhase={actions.selectPhase} onLoadMarkdown={actions.loadMarkdownDataToActiveBoard}
-          onAddPhase={actions.addPhaseToActiveBoard} onRenamePhase={actions.renamePhaseOnActiveBoard}
-          onDeletePhase={actions.deletePhaseFromActiveBoard}
-        />
-        {/* activeBoard is guaranteed to be non-null here, so activeBoard.id is safe */}
-        <KanbanBoard
-            key={`${activeBoard.id}-${activePhaseId}`}
-            tasks={tasksForDisplay}
-            setTasks={actions.setTasksForActiveBoard}
-            onDeleteTask={actions.deleteTask}
-            onUpdateTaskDueDate={actions.updateTaskDueDate}
-            addTaskToBoardColumn={actions.addTaskToBoardColumn}
-        />
-        <footer className="text-center p-4 text-sm text-text-muted mt-auto">
-            TaskMD Pro - Turn your markdown into a kanban board
-        </footer>
-      </Suspense>
+      <canvas
+        id="confetti-canvas"
+        className="fixed inset-0 w-full h-screen pointer-events-none z-[5000]"
+      ></canvas>
+      <div className="flex h-screen">
+        {/* Sidebar */}
+        <Suspense
+          fallback={<div className="w-16 bg-[var(--bg-secondary)]"></div>}
+        >
+          <Sidebar
+            isOpen={sidebarOpen}
+            onToggle={() => setSidebarOpen(!sidebarOpen)}
+            boards={boards}
+            activeBoard={activeBoard}
+            activeBoardPhases={activeBoard.phases || []}
+            activePhaseId={activePhaseId}
+            onAddBoard={actions.addBoard}
+            onSelectBoard={actions.selectBoard}
+            onRenameBoard={actions.renameBoard}
+            onDeleteBoard={actions.deleteBoard}
+            onSelectPhase={actions.selectPhase}
+            onAddPhase={actions.addPhaseToActiveBoard}
+            onRenamePhase={actions.renamePhaseOnActiveBoard}
+            onDeletePhase={actions.deletePhaseFromActiveBoard}
+          />
+        </Suspense>
+
+        {/* Main Content */}
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <Suspense fallback={<LoadingFallback />}>
+            <Header
+              // Remove board/phase related props - they're now in the sidebar
+              tasks={tasksForDisplay}
+              onLoadMarkdown={actions.loadMarkdownDataToActiveBoard}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              // Filter props
+              boardLabels={activeBoard?.labels || []}
+              selectedLabelIds={selectedLabelIds}
+              onSelectedLabelIdsChange={setSelectedLabelIds}
+              dueDateFilter={dueDateFilter}
+              onDueDateFilterChange={setDueDateFilter}
+            />
+          </Suspense>
+
+          {/* Kanban Board */}
+          <div className="flex-1 overflow-hidden">
+            <Suspense fallback={<LoadingFallback />}>
+              <KanbanBoard
+                key={`${activeBoard.id}-${activePhaseId}`}
+                tasks={filteredTasks}
+                setTasks={actions.setTasksForActiveBoard}
+                onDeleteTask={actions.deleteTask}
+                onUpdateTaskDueDate={actions.updateTaskDueDate}
+                onUpdateTask={actions.updateTask}
+                addTaskToBoardColumn={actions.addTaskToBoardColumn}
+                // Label-related props
+                boardLabels={activeBoard.labels || []}
+                onCreateLabel={actions.createLabel}
+                onUpdateLabel={actions.updateLabel}
+                onDeleteLabel={actions.deleteLabel}
+              />
+            </Suspense>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

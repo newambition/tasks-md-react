@@ -1,11 +1,10 @@
 // src/hooks/useKanbanManager.js
-import { useReducer, useEffect, useCallback } from 'react';
-import { kanbanReducer } from '../store/reducer';
-import { initialState } from '../store/initialState'; // getInitialData removed from here
-import * as actions from '../store/actionTypes';
-import { KANBAN_DATA_STORAGE_KEY, COLUMN_IDS } from '../constants';
-import { triggerConfetti as confettiEffect } from '../utils/confetti';
-
+import { useReducer, useEffect, useCallback } from "react";
+import { kanbanReducer } from "../store/reducer";
+import { initialState } from "../store/initialState"; // getInitialData removed from here
+import * as actions from "../store/actionTypes";
+import { KANBAN_DATA_STORAGE_KEY, COLUMN_IDS } from "../constants";
+import { triggerConfetti as confettiEffect } from "../utils/confetti";
 
 export const useKanbanManager = () => {
   const [state, dispatch] = useReducer(kanbanReducer, initialState);
@@ -35,8 +34,12 @@ export const useKanbanManager = () => {
     // Confirmation and board count check is now in the reducer for consistency,
     // but can also be kept here as a pre-dispatch check.
     // For this iteration, reducer handles the alert.
-    if (window.confirm('Are you sure you want to delete this board and all its tasks?')) {
-        dispatch({ type: actions.DELETE_BOARD, payload: { boardId } });
+    if (
+      window.confirm(
+        "Are you sure you want to delete this board and all its tasks?"
+      )
+    ) {
+      dispatch({ type: actions.DELETE_BOARD, payload: { boardId } });
     }
   }, []);
 
@@ -63,57 +66,106 @@ export const useKanbanManager = () => {
 
   const deletePhaseFromActiveBoard = useCallback((phaseIdToDelete) => {
     // Last phase deletion check is now in the reducer.
-    if (window.confirm('Are you sure you want to delete this phase? Tasks in this phase will become unphased.')) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this phase? Tasks in this phase will become unphased."
+      )
+    ) {
       dispatch({ type: actions.DELETE_PHASE, payload: { phaseIdToDelete } });
     }
   }, []);
 
   // --- Task Actions ---
-  const updateTasksAndConfetti = useCallback((updaterFn) => {
-    const activeBoardForConfetti = state.boards.find(b => b.id === state.activeBoardId);
-    if (!activeBoardForConfetti) return;
+  const updateTasksAndConfetti = useCallback(
+    (updaterFn) => {
+      const activeBoardForConfetti = state.boards.find(
+        (b) => b.id === state.activeBoardId
+      );
+      if (!activeBoardForConfetti) return;
 
-    const originalTasks = activeBoardForConfetti.tasks;
-    const newTasks = updaterFn(originalTasks); 
+      const originalTasks = activeBoardForConfetti.tasks;
+      const newTasks = updaterFn(originalTasks);
 
-    originalTasks.forEach(originalTask => {
-        const newTaskDetails = newTasks.find(t => t.id === originalTask.id);
-        if (newTaskDetails && newTaskDetails.status === COLUMN_IDS[2] && originalTask.status !== COLUMN_IDS[2]) {
-            confettiEffect();
+      originalTasks.forEach((originalTask) => {
+        const newTaskDetails = newTasks.find((t) => t.id === originalTask.id);
+        if (
+          newTaskDetails &&
+          newTaskDetails.status === COLUMN_IDS[2] &&
+          originalTask.status !== COLUMN_IDS[2]
+        ) {
+          confettiEffect();
         }
-    });
-    
-    dispatch({ type: actions.SET_TASKS_FOR_ACTIVE_BOARD, payload: { tasksOrUpdater: newTasks } });
+      });
 
-  }, [state.activeBoardId, state.boards]);
+      dispatch({
+        type: actions.SET_TASKS_FOR_ACTIVE_BOARD,
+        payload: { tasksOrUpdater: newTasks },
+      });
+    },
+    [state.activeBoardId, state.boards]
+  );
 
-
-  const addTaskToBoardColumn = useCallback((taskText, columnStatus, customDueDate = null) => {
-    dispatch({ type: actions.ADD_TASK_TO_COLUMN, payload: { taskText, columnStatus, customDueDate } });
-  }, []);
+  const addTaskToBoardColumn = useCallback(
+    (taskText, columnStatus, customDueDate = null) => {
+      dispatch({
+        type: actions.ADD_TASK_TO_COLUMN,
+        payload: { taskText, columnStatus, customDueDate },
+      });
+    },
+    []
+  );
 
   const deleteTask = useCallback((taskId) => {
     dispatch({ type: actions.DELETE_TASK, payload: { taskId } });
   }, []);
 
   const updateTaskDueDate = useCallback((taskId, newDueDate) => {
-    dispatch({ type: actions.UPDATE_TASK_DUE_DATE, payload: { taskId, newDueDate } });
+    dispatch({
+      type: actions.UPDATE_TASK_DUE_DATE,
+      payload: { taskId, newDueDate },
+    });
   }, []);
 
+  const updateTask = useCallback((taskId, updates) => {
+    dispatch({ type: actions.UPDATE_TASK, payload: { taskId, updates } });
+  }, []);
+
+  // --- Label Actions ---
+  const createLabel = useCallback((name, color) => {
+    dispatch({ type: actions.CREATE_LABEL, payload: { name, color } });
+  }, []);
+
+  const updateLabel = useCallback((labelId, updates) => {
+    dispatch({ type: actions.UPDATE_LABEL, payload: { labelId, updates } });
+  }, []);
+
+  const deleteLabel = useCallback((labelId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this label? It will be removed from all tasks."
+      )
+    ) {
+      dispatch({ type: actions.DELETE_LABEL, payload: { labelId } });
+    }
+  }, []);
 
   // --- Derived State ---
-  const activeBoard = state.boards.find(b => b.id === state.activeBoardId) || (state.boards.length > 0 ? state.boards[0] : null);
-  
+  const activeBoard =
+    state.boards.find((b) => b.id === state.activeBoardId) ||
+    (state.boards.length > 0 ? state.boards[0] : null);
+
   const tasksForDisplay = useCallback(() => {
-    if (!activeBoard || !state.activePhaseId) { // activePhaseId should always be set if board exists
-        // If activeBoard has no phases (which we try to prevent), activePhaseId might be null from reducer.
-        // In this scenario, no tasks are displayed for any specific phase.
-        return [];
+    if (!activeBoard || !state.activePhaseId) {
+      // activePhaseId should always be set if board exists
+      // If activeBoard has no phases (which we try to prevent), activePhaseId might be null from reducer.
+      // In this scenario, no tasks are displayed for any specific phase.
+      return [];
     }
     // Since "All Phases" is removed, activePhaseId should always be a valid ID.
-    return activeBoard.tasks.filter(task => task.phaseId === state.activePhaseId);
+    return activeBoard.tasks.filter(
+      (task) => task.phaseId === state.activePhaseId
+    );
   }, [activeBoard, state.activePhaseId])();
-
 
   return {
     state,
@@ -133,6 +185,10 @@ export const useKanbanManager = () => {
       addTaskToBoardColumn,
       deleteTask,
       updateTaskDueDate,
+      updateTask,
+      createLabel,
+      updateLabel,
+      deleteLabel,
     },
   };
 };

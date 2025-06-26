@@ -71,13 +71,13 @@ const InfoModal = React.memo(({ open, onClose }) => {
             <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
               #
             </span>{" "}
-            Level 1 headings become <b>boards</b>
+            Level 1 headings become <b>Spaces</b>
           </li>
           <li>
             <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
               ##
             </span>{" "}
-            Level 2 headings become <b>phases</b>
+            Level 2 headings become <b>Phases</b>
           </li>
           <li>
             <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
@@ -87,26 +87,26 @@ const InfoModal = React.memo(({ open, onClose }) => {
             <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
               - [x]
             </span>{" "}
-            lines become <b>tasks</b>
+            lines become <b>Tasks</b>
           </li>
           <li>
             <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
               (DD-MM-YY)
             </span>{" "}
-            become <b>due dates</b>
+            become <b>Due Dates</b>
           </li>
           <li>
             <span className="font-mono text-xs p-0.5 bg-cartoon-bg-medium rounded border border-cartoon-border-medium">
               [label(#color)]
             </span>{" "}
-            become <b>labels</b> with color being optional
+            become <b>Labels</b> with color being optional
           </li>
         </ul>
         <p
           className="text-xs mt-3"
           style={{ color: "var(--cartoon-border-medium)" }}
         >
-          Only tasks are required to populate the board, the rest is optional.
+          Only Tasks are required to populate the board, the rest is optional.
         </p>
       </div>
     </div>

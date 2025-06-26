@@ -244,7 +244,7 @@ const Sidebar = ({
       </div>
 
       {/* Sidebar Content */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-2 flex flex-col">
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -252,19 +252,273 @@ const Sidebar = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, delay: 0.1 }}
-              className="space-y-3"
+              className="flex flex-col h-full"
             >
+              {/* Boards Section */}
+              <div className="flex-1 mb-4">
+                {/* Boards Section Header */}
+                <div className="flex items-center justify-between mb-4 pb-2">
+                  <span
+                    className={`text-base font-bold text-[var(--text-heading)] uppercase tracking-wide ${
+                      theme === "dark"
+                        ? "text-[var(--text-heading)]"
+                        : "text-[var(--text-heading)]"
+                    }`}
+                  >
+                    My Spaces
+                  </span>
+                  <button
+                    onClick={handleAddBoard}
+                    className={`action-btn p-2 text-xs ${
+                      theme === "dark"
+                        ? "text-[var(--text-primary)]"
+                        : "text-[var(--text-primary)]"
+                    }`}
+                    title="Add new board"
+                  >
+                    <FaPlus />
+                  </button>
+                </div>
+
+                {/* Boards List */}
+                <div className="space-y-2">
+                  {boards.map((board) => {
+                    const isExpanded = expandedBoards.has(board.id);
+                    const isActive = activeBoard?.id === board.id;
+                    const boardPhases = isActive ? activeBoard.phases : [];
+
+                    return (
+                      <div key={board.id} className="select-none">
+                        {/* Board Item */}
+                        <div
+                          className={`flex items-center p-3 rounded-lg cursor-pointer group transition-all duration-150 ${
+                            isActive
+                              ? "bg-[var(--cartoon-primary)] text-[var(--text-inverted)]"
+                              : `hover:bg-[var(--cartoon-bg-medium)] ${
+                                  theme === "dark"
+                                    ? "text-[var(--text-primary)]"
+                                    : "text-[var(--text-primary)]"
+                                }`
+                          }`}
+                          onClick={() => {
+                            if (!isActive) {
+                              onSelectBoard(board.id);
+                            }
+                            toggleBoardExpansion(board.id);
+                          }}
+                        >
+                          <button
+                            className={`mr-3 p-1 rounded hover:bg-black/10 ${
+                              theme === "dark"
+                                ? "text-[var(--text-primary)]"
+                                : "text-[var(--text-primary)]"
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleBoardExpansion(board.id);
+                            }}
+                          >
+                            {isExpanded ? (
+                              <FaFolderOpen className="text-sm" />
+                            ) : (
+                              <FaFolder className="text-sm" />
+                            )}
+                          </button>
+
+                          {editingBoardId === board.id ? (
+                            <input
+                              ref={boardInputRef}
+                              type="text"
+                              value={editingBoardName}
+                              onChange={(e) =>
+                                setEditingBoardName(e.target.value)
+                              }
+                              onBlur={saveEditingBoard}
+                              onKeyDown={handleBoardKeyDown}
+                              className={`input-base text-sm py-1 px-2 flex-1 mr-2 ${
+                                theme === "dark"
+                                  ? "text-[var(--text-primary)]"
+                                  : "text-[var(--text-primary)]"
+                              }`}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          ) : (
+                            <span
+                              className={`flex-1 truncate text-sm font-semibold ${
+                                theme === "dark"
+                                  ? "text-[var(--text-primary)]"
+                                  : "text-[var(--text-primary)]"
+                              }`}
+                            >
+                              {board.name}
+                            </span>
+                          )}
+
+                          {/* Board Actions */}
+                          {!editingBoardId && (
+                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={(e) => startEditingBoard(board, e)}
+                                className={`p-1 rounded hover:bg-black/10 text-xs mr-1 ${
+                                  theme === "dark"
+                                    ? "text-[var(--text-primary)]"
+                                    : "text-[var(--text-primary)]"
+                                }`}
+                                title="Rename board"
+                              >
+                                <FaEdit />
+                              </button>
+                              {boards.length > 1 && (
+                                <button
+                                  onClick={(e) =>
+                                    handleDeleteBoard(board.id, e)
+                                  }
+                                  className={`p-1 rounded hover:bg-black/10 text-xs text-[var(--delete-btn-text)] ${
+                                    theme === "dark"
+                                      ? "text-[var(--delete-btn-text)]"
+                                      : "text-[var(--delete-btn-text)]"
+                                  }`}
+                                  title="Delete board"
+                                >
+                                  <FaTrash />
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Phases List */}
+                        <AnimatePresence>
+                          {isExpanded && boardPhases.length > 0 && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="ml-8 mt-2 space-y-1.5 overflow-hidden"
+                            >
+                              {boardPhases.map((phase) => (
+                                <div
+                                  key={phase.id}
+                                  className={`flex items-center p-2.5 rounded-md cursor-pointer group transition-all duration-150 ${
+                                    activePhaseId === phase.id
+                                      ? "bg-[var(--cartoon-accent)] text-[var(--button-secondary-text)]"
+                                      : "hover:bg-[var(--cartoon-bg-light)] text-[var(--text-secondary)]"
+                                  }`}
+                                  onClick={() => onSelectPhase(phase.id)}
+                                >
+                                  <FaFile className="mr-3 text-xs" />
+
+                                  {editingPhaseId === phase.id ? (
+                                    <input
+                                      ref={phaseInputRef}
+                                      type="text"
+                                      value={editingPhaseName}
+                                      onChange={(e) =>
+                                        setEditingPhaseName(e.target.value)
+                                      }
+                                      onBlur={saveEditingPhase}
+                                      onKeyDown={handlePhaseKeyDown}
+                                      className={`input-base text-sm py-1 px-2 flex-1 mr-2 ${
+                                        theme === "dark"
+                                          ? "text-[var(--text-primary)]"
+                                          : "text-[var(--text-primary)]"
+                                      }`}
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                  ) : (
+                                    <span
+                                      className={`flex-1 truncate text-sm ${
+                                        theme === "dark"
+                                          ? "text-[var(--text-primary)]"
+                                          : "text-[var(--text-primary)]"
+                                      }`}
+                                    >
+                                      {phase.name}
+                                    </span>
+                                  )}
+
+                                  {/* Phase Actions */}
+                                  {!editingPhaseId && (
+                                    <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <button
+                                        onClick={(e) =>
+                                          startEditingPhase(phase, e)
+                                        }
+                                        className={`p-1 rounded hover:bg-black/10 text-xs mr-1 ${
+                                          theme === "dark"
+                                            ? "text-[var(--text-primary)]"
+                                            : "text-[var(--text-primary)]"
+                                        }`}
+                                        title="Rename phase"
+                                      >
+                                        <FaEdit />
+                                      </button>
+                                      {boardPhases.length > 1 && (
+                                        <button
+                                          onClick={(e) =>
+                                            handleDeletePhase(phase.id, e)
+                                          }
+                                          className={`p-1 rounded hover:bg-black/10 text-xs text-[var(--delete-btn-text)] ${
+                                            theme === "dark"
+                                              ? "text-[var(--delete-btn-text)]"
+                                              : "text-[var(--delete-btn-text)]"
+                                          }`}
+                                          title="Delete phase"
+                                        >
+                                          <FaTrash />
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+
+                              {/* Add Phase Button */}
+                              <button
+                                onClick={(e) => handleAddPhase(board.id, e)}
+                                className="flex items-center w-full p-2.5 rounded-md text-[var(--cartoon-green)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm"
+                              >
+                                <FaPlus className="mr-3 text-xs" />
+                                Add Phase
+                              </button>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        {/* Add Phase Button for Active Board with No Phases */}
+                        {isActive && isExpanded && boardPhases.length === 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="ml-8 mt-2"
+                          >
+                            <button
+                              onClick={(e) => handleAddPhase(board.id, e)}
+                              className="flex items-center w-full p-2.5 rounded-md text-[var(--cartoon-green)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm"
+                            >
+                              <FaPlus className="mr-3 text-xs" />
+                              Add First Phase
+                            </button>
+                          </motion.div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* File Operations Section */}
-              <div className="mb-4 pt-4 pb-4 border-t border-b border-[var(--cartoon-border-dark)]">
-                <div className="flex items-center justify-between"></div>
-                <div className="space-y-3">
+              <div className="border-t border-[var(--cartoon-border-dark)] pt-3">
+                <div className="space-y-2">
                   {/* Load MD Button */}
                   <motion.label
                     htmlFor="md-upload"
-                    className="btn btn-secondary px-3 py-2 text-sm cursor-pointer flex items-center gap-1.5 w-full"
+                    className="btn btn-secondary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
                     title="Load tasks from .MD file into current board"
                   >
-                    <FaFolderOpen /> Load MD
+                    <FaFolderOpen className="text-sm" /> Load MD
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -278,261 +532,12 @@ const Sidebar = ({
                   {/* Export MD Button */}
                   <motion.button
                     onClick={handleExportMarkdown}
-                    className="btn btn-secondary px-3 py-2 text-sm cursor-pointer flex items-center gap-1.5 w-full"
+                    className="btn btn-secondary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
                     title="Export current board to .MD file"
                   >
-                    <FaDownload /> Export MD
+                    <FaDownload className="text-sm" /> Export MD
                   </motion.button>
                 </div>
-              </div>
-              {/* Boards Section Header */}
-              <div className="flex items-center justify-between mt-2 mb-2 px-2">
-                <span
-                  className={`text-base font-bold text-[var(--text-heading)] uppercase tracking-wide ${
-                    theme === "dark"
-                      ? "text-[var(--text-heading)]"
-                      : "text-[var(--text-heading)]"
-                  }`}
-                >
-                  My Boards
-                </span>
-                <button
-                  onClick={handleAddBoard}
-                  className={`action-btn p-3 text-xs ${
-                    theme === "dark"
-                      ? "text-[var(--text-primary)]"
-                      : "text-[var(--text-primary)]"
-                  }`}
-                  title="Add new board"
-                >
-                  <FaPlus />
-                </button>
-              </div>
-
-              {/* Boards List */}
-              <div className="space-y-2">
-                {boards.map((board) => {
-                  const isExpanded = expandedBoards.has(board.id);
-                  const isActive = activeBoard?.id === board.id;
-                  const boardPhases = isActive ? activeBoard.phases : [];
-
-                  return (
-                    <div key={board.id} className="select-none">
-                      {/* Board Item */}
-                      <div
-                        className={`flex items-center p-2 rounded-lg cursor-pointer group transition-all duration-150 ${
-                          isActive
-                            ? "bg-[var(--cartoon-primary)] text-[var(--text-inverted)]"
-                            : `hover:bg-[var(--cartoon-bg-medium)] ${
-                                theme === "dark"
-                                  ? "text-[var(--text-primary)]"
-                                  : "text-[var(--text-primary)]"
-                              }`
-                        }`}
-                        onClick={() => {
-                          if (!isActive) {
-                            onSelectBoard(board.id);
-                          }
-                          toggleBoardExpansion(board.id);
-                        }}
-                      >
-                        <button
-                          className={`mr-2 p-1 rounded hover:bg-black/10 ${
-                            theme === "dark"
-                              ? "text-[var(--text-primary)]"
-                              : "text-[var(--text-primary)]"
-                          }`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleBoardExpansion(board.id);
-                          }}
-                        >
-                          {isExpanded ? (
-                            <FaFolderOpen className="text-sm" />
-                          ) : (
-                            <FaFolder className="text-sm" />
-                          )}
-                        </button>
-
-                        {editingBoardId === board.id ? (
-                          <input
-                            ref={boardInputRef}
-                            type="text"
-                            value={editingBoardName}
-                            onChange={(e) =>
-                              setEditingBoardName(e.target.value)
-                            }
-                            onBlur={saveEditingBoard}
-                            onKeyDown={handleBoardKeyDown}
-                            className={`input-base text-sm py-1 px-2 flex-1 mr-2 ${
-                              theme === "dark"
-                                ? "text-[var(--text-primary)]"
-                                : "text-[var(--text-primary)]"
-                            }`}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        ) : (
-                          <span
-                            className={`flex-1 truncate text-sm font-semibold ${
-                              theme === "dark"
-                                ? "text-[var(--text-primary)]"
-                                : "text-[var(--text-primary)]"
-                            }`}
-                          >
-                            {board.name}
-                          </span>
-                        )}
-
-                        {/* Board Actions */}
-                        {!editingBoardId && (
-                          <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={(e) => startEditingBoard(board, e)}
-                              className={`p-1 rounded hover:bg-black/10 text-xs mr-1 ${
-                                theme === "dark"
-                                  ? "text-[var(--text-primary)]"
-                                  : "text-[var(--text-primary)]"
-                              }`}
-                              title="Rename board"
-                            >
-                              <FaEdit />
-                            </button>
-                            {boards.length > 1 && (
-                              <button
-                                onClick={(e) => handleDeleteBoard(board.id, e)}
-                                className={`p-1 rounded hover:bg-black/10 text-xs text-[var(--delete-btn-text)] ${
-                                  theme === "dark"
-                                    ? "text-[var(--delete-btn-text)]"
-                                    : "text-[var(--delete-btn-text)]"
-                                }`}
-                                title="Delete board"
-                              >
-                                <FaTrash />
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Phases List */}
-                      <AnimatePresence>
-                        {isExpanded && boardPhases.length > 0 && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="ml-6 mt-1 space-y-1.5 overflow-hidden"
-                          >
-                            {boardPhases.map((phase) => (
-                              <div
-                                key={phase.id}
-                                className={`flex items-center p-2 rounded-md cursor-pointer group transition-all duration-150 ${
-                                  activePhaseId === phase.id
-                                    ? "bg-[var(--cartoon-accent)] text-[var(--button-secondary-text)]"
-                                    : "hover:bg-[var(--cartoon-bg-light)] text-[var(--text-secondary)]"
-                                }`}
-                                onClick={() => onSelectPhase(phase.id)}
-                              >
-                                <FaFile className="mr-2 text-xs" />
-
-                                {editingPhaseId === phase.id ? (
-                                  <input
-                                    ref={phaseInputRef}
-                                    type="text"
-                                    value={editingPhaseName}
-                                    onChange={(e) =>
-                                      setEditingPhaseName(e.target.value)
-                                    }
-                                    onBlur={saveEditingPhase}
-                                    onKeyDown={handlePhaseKeyDown}
-                                    className={`input-base text-sm py-1 px-2 flex-1 mr-2 ${
-                                      theme === "dark"
-                                        ? "text-[var(--text-primary)]"
-                                        : "text-[var(--text-primary)]"
-                                    }`}
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                ) : (
-                                  <span
-                                    className={`flex-1 truncate text-sm ${
-                                      theme === "dark"
-                                        ? "text-[var(--text-primary)]"
-                                        : "text-[var(--text-primary)]"
-                                    }`}
-                                  >
-                                    {phase.name}
-                                  </span>
-                                )}
-
-                                {/* Phase Actions */}
-                                {!editingPhaseId && (
-                                  <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                      onClick={(e) =>
-                                        startEditingPhase(phase, e)
-                                      }
-                                      className={`p-1 rounded hover:bg-black/10 text-xs mr-1 ${
-                                        theme === "dark"
-                                          ? "text-[var(--text-primary)]"
-                                          : "text-[var(--text-primary)]"
-                                      }`}
-                                      title="Rename phase"
-                                    >
-                                      <FaEdit />
-                                    </button>
-                                    {boardPhases.length > 1 && (
-                                      <button
-                                        onClick={(e) =>
-                                          handleDeletePhase(phase.id, e)
-                                        }
-                                        className={`p-1 rounded hover:bg-black/10 text-xs text-[var(--delete-btn-text)] ${
-                                          theme === "dark"
-                                            ? "text-[var(--delete-btn-text)]"
-                                            : "text-[var(--delete-btn-text)]"
-                                        }`}
-                                        title="Delete phase"
-                                      >
-                                        <FaTrash />
-                                      </button>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-
-                            {/* Add Phase Button */}
-                            <button
-                              onClick={(e) => handleAddPhase(board.id, e)}
-                              className={`flex items-center w-full p-2 rounded-md text-[var(--cartoon-green)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm`}
-                            >
-                              <FaPlus className="mr-2 text-xs" />
-                              Add Phase
-                            </button>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Add Phase Button for Active Board with No Phases */}
-                      {isActive && isExpanded && boardPhases.length === 0 && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="ml-6 mt-1"
-                        >
-                          <button
-                            onClick={(e) => handleAddPhase(board.id, e)}
-                            className={`flex items-center w-full p-2 rounded-md text-[var(--cartoon-green)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm`}
-                          >
-                            <FaPlus className="mr-2 text-xs" />
-                            Add First Phase
-                          </button>
-                        </motion.div>
-                      )}
-                    </div>
-                  );
-                })}
               </div>
             </motion.div>
           )}

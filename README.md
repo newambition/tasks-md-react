@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/newambition/tasks-md-react/main/public/logo512.png" alt="TaskMD Pro Logo" width="150"/>
+<img src="https://raw.githubusercontent.com/newambition/tasks-md-react/main/public/TaskMDProIcon.png" alt="TaskMD Pro Logo" width="150"/>
 
 # 🎨 TaskMD Pro 🖍️
 
@@ -31,14 +31,12 @@ A fun, cartoon-styled Kanban board that brings your Markdown task lists to life!
 
 **TaskMD Pro** is for everyone who loves the simplicity of Markdown but craves the visual power of a Kanban board. Ditch the boring text files and watch your tasks pop into an interactive, drag-and-drop world with a playful cartoon theme.
 
-Simply write your tasks in a `.md` file, load it up, and get organizing!
+Simply write your tasks in a `.md` file, load it up, and get organizing! Export back into a `.md` file at any time, giving you full control.
 
 <br>
 
 <div align="center">
-  <img src="https://i.imgur.com/your-screenshot.png" alt="TaskMD Pro Screenshot" width="700"/>
-  <br />
-  <em>(Replace this with a cool screenshot or GIF of your app!)</em>
+  <img src="https://raw.githubusercontent.com/newambition/tasks-md-react/main/public/app-screenshot.png" alt="TaskMD Pro Screenshot" width="700"/>
 </div>
 
 ### Built With
@@ -88,8 +86,8 @@ TaskMD Pro understands a special flavor of Markdown to build your boards.
 
 ### The Magic Words (Markdown Format)
 
-- `# Board Name` becomes the title of your board.
-- `## Phase Name` creates your columns (e.g., "To Do", "In Progress").
+- `# Space Name` become the titles of your Spaces.
+- `## Phase Name` become the names of boards within spaces
 - `- [ ] Your task here` is a new task.
 - `- [x] Your completed task` is a finished task.
 - Add a due date with `(DD-MM-YY)`.
@@ -123,8 +121,8 @@ Here's what's on the drawing board for TaskMD Pro:
 - [ ] **Advanced Filtering:** Filter by due date range and more.
 - [ ] **Customizable Columns:** Add, rename, and reorder your columns.
 - [ ] **WIP Limits:** Set work-in-progress limits for your columns.
-- [ ] **Export to Markdown:** Save your board state back to a `.md` file.
-- [ ] **Backend & Collaboration:** User accounts, real-time sync, and more!
+- [x] **Export to Markdown:** Save your board state back to a `.md` file.
+- [ ] **File System Access API** Save directly to a chosen folder without the need for export.
 
 See the open [issues](https://github.com/newambition/tasks-md-react/issues) for a full list of proposed features (and known issues).
 

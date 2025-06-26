@@ -207,7 +207,7 @@ const Column = React.memo(
               whileHover="hover"
               whileTap="tap"
               // Styling for circular cartoon button
-              className="w-10 h-10 rounded-full flex items-center justify-center border-[2.5px] border-solid shadow-[2px_2px_0px_var(--cartoon-border-dark)] transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cartoon-bg-light"
+              className="w-8 h-8 rounded-full flex items-center justify-center border-[2.5px] border-solid shadow-[2px_2px_0px_var(--cartoon-border-dark)] transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cartoon-bg-light"
               style={{
                 ...getButtonBgStyle(),
                 borderColor: "var(--cartoon-border-dark)",

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/newambition/tasks-md-react/main/public/TaskMDProIcon.png" alt="TaskMD Pro Logo" width="150"/>
+<img src="https://raw.githubusercontent.com/newambition/tasks-md-react/main/public/TaskMDProIcon.png" alt="TaskMD Pro Logo" width="200"/>
 
 # 🎨 TaskMD Pro 🖍️
 
@@ -45,7 +45,7 @@ This project is built with a modern, front-end stack that you already know and l
 
 - [![React][React.js]][React-url]
 - [![Tailwind CSS][TailwindCSS]][TailwindCSS-url]
-- Framer Motion
+- [![Framer Motion]
 - dnd-kit
 
 ---
@@ -164,3 +164,5 @@ A huge thank you to the creators of these amazing tools that made TaskMD Pro pos
 [React-url]: https://reactjs.org/
 [TailwindCSS]: https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white
 [TailwindCSS-url]: https://tailwindcss.com/
+
+[]

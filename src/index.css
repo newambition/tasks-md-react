@@ -190,7 +190,7 @@ body {
 
 /* Button Base Styles */
 .btn {
-  @apply px-4 py-2 font-medium focus:outline-none transition-all duration-200 ease-in-out;
+  @apply px-3 py-1.5 font-medium focus:outline-none transition-all duration-200 ease-in-out;
   font-family: var(--cartoon-font);
   font-weight: 700; /* [cite: 7, 21] */
   border-radius: 10px; /* [cite: 11, 19] */
@@ -252,7 +252,7 @@ body {
   @apply text-sm cursor-pointer transition-all duration-200 ease-in-out;
   font-family: var(--cartoon-font);
   font-weight: 600; /* [cite: 6] */
-  padding: 0.5rem 2.25rem 0.5rem 1rem;
+  padding: 0.5rem 2.25rem 0.5rem 0.75rem;
   border-radius: 10px; /* [cite: 11] */
   border: 2.5px solid var(--cartoon-border-dark); /* [cite: 10] */
   box-shadow: 2px 2px 0px var(--cartoon-border-dark); /* [cite: 14] */
@@ -284,7 +284,7 @@ html.dark .styled-select {
 
 /* Input Base Styles */
 .input-base {
-  @apply text-sm p-3;
+  @apply text-sm p-1.5;
   font-family: var(--cartoon-font);
   font-weight: 600; /* [cite: 6, 35] */
   border-radius: 10px; /* [cite: 11] */
@@ -309,15 +309,15 @@ html.dark .styled-select {
 .action-btn {
   @apply p-2 rounded-full leading-none transition-all duration-200 ease-in-out;
   font-family: var(--cartoon-font);
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 2px solid var(--cartoon-border-dark); /* [cite: 21] */
   box-shadow: 1.5px 1.5px 0px var(--cartoon-border-dark); /* [cite: 22] */
   color: var(--cartoon-border-dark); /* Text color of icon */
-  background-color: var(--bg-secondary); /* Use component bg */
+  background-color: var(--cartoon-accent); /* Use component bg */
 }
 .action-btn:hover {
   transform: translate(1px, 1px);
@@ -336,7 +336,7 @@ html.dark .styled-select {
 
 /* Kanban Column Styles */
 .kanban-column {
-  @apply rounded-xl border-[3px] border-solid flex flex-col;
+  @apply rounded-xl border-[2.5px] border-solid flex flex-col;
   background-color: var(--cartoon-bg-light);
   border-color: var(--cartoon-border-dark);
   box-shadow: 4px 4px 0px var(--cartoon-shadow-color);
@@ -344,7 +344,7 @@ html.dark .styled-select {
 }
 
 .filter-date-btn {
-  @apply w-full px-2 py-1.5 rounded-lg border-2 border-transparent font-semibold;
+  @apply w-full px-1 py-0.5 rounded-lg border-2 border-transparent font-semibold;
   background-color: var(--cartoon-bg-medium);
   color: var(--text-secondary);
   transition: all 0.2s ease-in-out;
@@ -364,11 +364,11 @@ html.dark .styled-select {
 
 /* Kanban Header uses specific vibrant BGs, text color handled by --text-inverted or --button-secondary-text */
 .kanban-header {
-  @apply font-semibold p-4 text-center;
+  @apply font-semibold p-3 text-center;
   font-family: var(--cartoon-font);
   font-weight: 800; /* [cite: 8] */
   /* color is set by specific header classes below */
-  border-bottom: 3px solid var(--cartoon-border-dark); /* [cite: 9] */
+  border-bottom: 2.5px solid var(--cartoon-border-dark); /* [cite: 9] */
   border-radius: 17px 17px 0 0;
 }
 .header-todo {
@@ -388,7 +388,7 @@ html.dark .styled-select {
 } /* [cite: 3] */
 
 .task-list-container {
-  @apply p-4 flex-grow overflow-y-auto;
+  @apply p-3 flex-grow overflow-y-auto;
 }
 .task-list {
   @apply space-y-4;
@@ -399,10 +399,10 @@ html.dark .styled-select {
   background-color: var(
     --bg-component-explicit-white
   ); /* Use specific var for white/light component bg */
-  border: 3px solid var(--border-card); /* [cite: 29] Use theme var */
+  border: 2.5px solid var(--border-card); /* [cite: 29] Use theme var */
   box-shadow: 4px 4px 0px var(--cartoon-shadow-color); /* [cite: 29] */
   border-radius: 20px; /* [cite: 30] */
-  padding: 1rem;
+  padding: 0.5rem;
   font-family: var(--cartoon-font);
   color: var(--text-primary); /* Use theme var */
   transition: all 0.2s ease-in-out;
@@ -443,7 +443,7 @@ a:hover {
 
 /* Error Message Styling */
 .error-message {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   margin-bottom: 1rem;
   color: var(--cartoon-secondary); /* [cite: 49] */
   background-color: color-mix(
@@ -452,8 +452,8 @@ a:hover {
     white
   ); /* Lighter red from var */
   border: 2.5px solid var(--cartoon-secondary); /* [cite: 49] */
-  box-shadow: 3px 3px 0px var(--cartoon-secondary); /* [cite: 49] */
-  border-radius: 12px; /* [cite: 49] */
+  box-shadow: 2px 2px 0px var(--cartoon-secondary); /* [cite: 49] */
+  border-radius: 10px; /* [cite: 49] */
   font-weight: 700; /* [cite: 49] */
   font-family: var(--cartoon-font);
 }

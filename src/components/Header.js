@@ -69,10 +69,10 @@ const Header = React.memo(
           fontFamily: "var(--cartoon-font)",
         }}
       >
-        <div className="flex items-center justify-between w-full px-4 py-3 ">
+        <div className="flex items-center justify-between w-full px-4 py-1.5 ">
           <div className="flex items-center gap-3 md:gap-4 flex-wrap">
             <h1
-              className="text-3xl md:text-3xl font-black mr-2 md:mx-2 mt-1 tracking-tighter cursor-default select-none"
+              className="text-xl md:text-2xl font-black ml-4 md:mx-4 mt-1 tracking-tighter cursor-default select-none"
               style={{
                 color: "var(--text-heading)",
                 fontFamily: "var(--cartoon-font)",
@@ -80,6 +80,12 @@ const Header = React.memo(
             >
               TaskMD Pro
             </h1>
+            <img
+              src={"./TaskMDProIcon.png"}
+              alt="TaskMD Pro Logo"
+              width="50"
+              className="-ml-8 "
+            />
 
             {/* Search Input and Filter */}
             <div className="flex items-center gap-2">
@@ -222,8 +228,8 @@ const Header = React.memo(
                 border: "2px solid var(--cartoon-border-dark)",
                 boxShadow: "2px 2px 0px var(--cartoon-shadow-color)",
                 borderRadius: "30px",
-                width: "56px",
-                height: "32px",
+                width: "48px",
+                height: "28px",
               }}
             >
               <motion.div

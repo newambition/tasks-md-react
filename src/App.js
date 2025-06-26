@@ -5,6 +5,8 @@ import { DEFAULT_BOARD_NAME } from "./constants";
 import SplashScreen from "./components/SplashScreen";
 import { getDueDateStatus } from "./utils/helpers";
 import { useKanbanManager } from "./hooks/useKanbanManager";
+import { useFileSystem } from "./hooks/useFileSystem";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 const Header = lazy(() => import("./components/Header"));
 const KanbanBoard = lazy(() => import("./components/KanbanBoard"));
 const Sidebar = lazy(() => import("./components/Sidebar"));
@@ -17,6 +19,25 @@ const LoadingFallback = () => (
     {/* Minimal content, or even just the background, to reduce flash */}
   </div>
 );
+
+// Toggle Button Component
+const SidebarToggle = ({ isOpen, onToggle }) => {
+  return (
+    <button
+      onClick={onToggle}
+      className={`fixed top-5 w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all duration-300 z-[9999] bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--cartoon-bg-medium)]`}
+      style={{
+        left: isOpen ? "308px" : "8px", // 320px - 12px for open, 20px - 12px for closed
+        border: "2px solid var(--cartoon-border-dark)",
+        boxShadow: "2px 2px 0px var(--cartoon-shadow-color)",
+        fontFamily: "var(--cartoon-font)",
+      }}
+      title={isOpen ? "Collapse sidebar" : "Expand sidebar"}
+    >
+      {isOpen ? <FaChevronLeft /> : <FaChevronRight />}
+    </button>
+  );
+};
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -34,6 +55,9 @@ function App() {
     tasksForDisplay,
     actions,
   } = useKanbanManager();
+
+  const { openFile, saveFile, saveFileAs, fileName, isApiSupported } =
+    useFileSystem();
 
   const filteredTasks = useMemo(() => {
     let tasks = tasksForDisplay;
@@ -64,6 +88,25 @@ function App() {
 
     return tasks;
   }, [tasksForDisplay, searchTerm, selectedLabelIds, dueDateFilter]);
+
+  const handleOpenFile = async () => {
+    const content = await openFile();
+    if (content !== null) {
+      actions.loadMarkdownDataToActiveBoard(content);
+    }
+  };
+
+  const handleSaveFile = () => {
+    if (activeBoard) {
+      saveFile(activeBoard); // Pass activeBoard to saveFile
+    }
+  };
+
+  const handleSaveFileAs = () => {
+    if (activeBoard) {
+      saveFileAs(activeBoard); // Pass activeBoard to saveFileAs
+    }
+  };
 
   const { boards, activeBoardId, activePhaseId } = state;
 
@@ -104,6 +147,10 @@ function App() {
           id="confetti-canvas"
           className="fixed inset-0 w-full h-screen pointer-events-none z-[5000]"
         ></canvas>
+        <SidebarToggle
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+        />
         <div className="flex h-screen">
           {/* Sidebar */}
           <Suspense
@@ -111,7 +158,6 @@ function App() {
           >
             <Sidebar
               isOpen={sidebarOpen}
-              onToggle={() => setSidebarOpen(!sidebarOpen)}
               boards={boards}
               activeBoard={null}
               activePhaseId={null}
@@ -123,6 +169,13 @@ function App() {
               onAddPhase={actions.addPhaseToActiveBoard}
               onRenamePhase={actions.renamePhaseOnActiveBoard}
               onDeletePhase={actions.deletePhaseFromActiveBoard}
+              tasks={[]}
+              onLoadMarkdown={actions.loadMarkdownDataToActiveBoard}
+              onOpenFile={handleOpenFile}
+              onSaveFile={handleSaveFile}
+              onSaveFileAs={handleSaveFileAs}
+              fileName={fileName}
+              isApiSupported={isApiSupported}
             />
           </Suspense>
 
@@ -135,6 +188,11 @@ function App() {
                 onLoadMarkdown={actions.loadMarkdownDataToActiveBoard}
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
+                onOpenFile={handleOpenFile}
+                onSaveFile={handleSaveFile}
+                onSaveFileAs={handleSaveFileAs}
+                fileName={fileName}
+                isApiSupported={isApiSupported}
                 // Filter props
                 boardLabels={[]}
                 selectedLabelIds={selectedLabelIds}
@@ -148,13 +206,13 @@ function App() {
                 No Boards Available
               </h1>
               <p className="mb-6 text-text-secondary">
-                Create a new board to get started.
+                Create a new Space to get started.
               </p>
               <button
                 onClick={() => actions.addBoard(DEFAULT_BOARD_NAME)}
                 className="btn btn-primary px-6 py-3 text-base"
               >
-                + Create Default Board
+                + Create Default Space
               </button>
             </div>
           </div>
@@ -179,6 +237,10 @@ function App() {
         id="confetti-canvas"
         className="fixed inset-0 w-full h-screen pointer-events-none z-[5000]"
       ></canvas>
+      <SidebarToggle
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+      />
       <div className="flex h-screen">
         {/* Sidebar */}
         <Suspense
@@ -186,7 +248,6 @@ function App() {
         >
           <Sidebar
             isOpen={sidebarOpen}
-            onToggle={() => setSidebarOpen(!sidebarOpen)}
             boards={boards}
             activeBoard={activeBoard}
             activePhaseId={activePhaseId}
@@ -198,6 +259,13 @@ function App() {
             onAddPhase={actions.addPhaseToActiveBoard}
             onRenamePhase={actions.renamePhaseOnActiveBoard}
             onDeletePhase={actions.deletePhaseFromActiveBoard}
+            tasks={tasksForDisplay}
+            onLoadMarkdown={actions.loadMarkdownDataToActiveBoard}
+            onOpenFile={handleOpenFile}
+            onSaveFile={handleSaveFile}
+            onSaveFileAs={handleSaveFileAs}
+            fileName={fileName}
+            isApiSupported={isApiSupported}
           />
         </Suspense>
 

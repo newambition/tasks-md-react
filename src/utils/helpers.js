@@ -122,34 +122,56 @@ export function formatLabelsForExport(labelIds, boardLabels) {
 }
 
 /**
- * Export the content back into markdown format
- * Updated to handle the new task structure with proper labels format
+ * Export the content of a single board back into markdown format.
+ * @param {object} board - The board object to export.
+ * @returns {string} - The markdown content of the board.
  */
-export function exportContent(boards, phases, tasks, boardLabels = []) {
-  let content = "";
+export function exportContent(board) {
+  if (!board) return "# No board data to export";
 
-  // Export boards
-  boards.forEach((board) => {
-    content += `# ${board.name}\n\n`;
-  });
+  let content = `# ${board.name}\n\n`;
 
-  // Group tasks by phase and export by phase
+  const phases = board.phases || [];
+  const tasks = board.tasks || [];
+  const boardLabels = board.labels || [];
+
+  // If there are no phases, just list all tasks under the board.
+  if (phases.length === 0) {
+    tasks.forEach((task) => {
+      const checkbox = task.status === "done" ? "- [x]" : "- [ ]";
+      const dueDateText = task.dueDate ? ` (${task.dueDate})` : "";
+      const labelsText = formatLabelsForExport(task.labels, boardLabels);
+      content += `${checkbox} ${task.text}${labelsText}${dueDateText}\n`;
+    });
+    return content;
+  }
+
+  // Group tasks by phase and export
   phases.forEach((phase) => {
     content += `## ${phase.name}\n`;
-
-    // Find tasks for this phase
     const phaseTasks = tasks.filter((task) => task.phaseId === phase.id);
 
     phaseTasks.forEach((task) => {
       const checkbox = task.status === "done" ? "- [x]" : "- [ ]";
       const dueDateText = task.dueDate ? ` (${task.dueDate})` : "";
       const labelsText = formatLabelsForExport(task.labels, boardLabels);
-
       content += `${checkbox} ${task.text}${labelsText}${dueDateText}\n`;
     });
-
-    content += "\n"; // Add spacing between phases
+    content += "\n";
   });
+
+  // Append any tasks that might not have a phaseId
+  const unphasedTasks = tasks.filter((task) => !task.phaseId);
+  if (unphasedTasks.length > 0) {
+    content += `## Uncategorized\n`;
+    unphasedTasks.forEach((task) => {
+      const checkbox = task.status === "done" ? "- [x]" : "- [ ]";
+      const dueDateText = task.dueDate ? ` (${task.dueDate})` : "";
+      const labelsText = formatLabelsForExport(task.labels, boardLabels);
+      content += `${checkbox} ${task.text}${labelsText}${dueDateText}\n`;
+    });
+    content += "\n";
+  }
 
   return content;
 }

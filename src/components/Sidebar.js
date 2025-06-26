@@ -4,20 +4,18 @@ import { exportContent } from "../utils/helpers";
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FaChevronLeft,
-  FaChevronRight,
   FaFolder,
   FaFolderOpen,
+  FaSave,
+  FaFileExport,
   FaFile,
   FaPlus,
   FaEdit,
   FaTrash,
-  FaDownload,
 } from "react-icons/fa";
 
 const Sidebar = ({
   isOpen,
-  onToggle,
   boards = [],
   activeBoard,
   activePhaseId,
@@ -31,6 +29,11 @@ const Sidebar = ({
   onDeletePhase,
   tasks = [],
   onLoadMarkdown,
+  onOpenFile,
+  onSaveFile,
+  onSaveFileAs,
+  fileName,
+  isApiSupported,
 }) => {
   const { theme } = useTheme();
   const [expandedBoards, setExpandedBoards] = useState(new Set());
@@ -38,8 +41,11 @@ const Sidebar = ({
   const [editingPhaseId, setEditingPhaseId] = useState(null);
   const [editingBoardName, setEditingBoardName] = useState("");
   const [editingPhaseName, setEditingPhaseName] = useState("");
+  const [isAddingNewSpace, setIsAddingNewSpace] = useState(false);
+  const [newSpaceName, setNewSpaceName] = useState("");
   const boardInputRef = useRef(null);
   const phaseInputRef = useRef(null);
+  const newSpaceInputRef = useRef(null);
   const fileInputRef = useRef(null);
 
   // Auto-expand the active board
@@ -64,6 +70,12 @@ const Sidebar = ({
     }
   }, [editingPhaseId]);
 
+  useEffect(() => {
+    if (isAddingNewSpace && newSpaceInputRef.current) {
+      newSpaceInputRef.current.focus();
+    }
+  }, [isAddingNewSpace]);
+
   const toggleBoardExpansion = (boardId) => {
     setExpandedBoards((prev) => {
       const newSet = new Set(prev);
@@ -77,9 +89,29 @@ const Sidebar = ({
   };
 
   const handleAddBoard = () => {
-    const newBoardName = prompt("Enter name for the new board:");
-    if (newBoardName && newBoardName.trim()) {
-      onAddBoard(newBoardName.trim());
+    setIsAddingNewSpace(true);
+    setNewSpaceName("");
+  };
+
+  const saveNewSpace = () => {
+    if (newSpaceName.trim()) {
+      onAddBoard(newSpaceName.trim());
+    }
+    setIsAddingNewSpace(false);
+    setNewSpaceName("");
+  };
+
+  const cancelNewSpace = () => {
+    setIsAddingNewSpace(false);
+    setNewSpaceName("");
+  };
+
+  const handleNewSpaceKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveNewSpace();
+    } else if (e.key === "Escape") {
+      cancelNewSpace();
     }
   };
 
@@ -163,86 +195,20 @@ const Sidebar = ({
     }
   };
 
-  const internalHandleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type === "text/markdown") {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target.result;
-        onLoadMarkdown(content);
-      };
-      reader.readAsText(file);
-    } else {
-      console.warn("Please select a valid Markdown (.md) file.");
-    }
-    event.target.value = "";
-  };
-
-  const handleExportMarkdown = () => {
-    try {
-      const content = exportContent(tasks);
-      const blob = new Blob([content], { type: "text/markdown" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `tasks-${new Date().toISOString().split("T")[0]}.md`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error exporting markdown:", error);
-    }
-  };
-
-  const sidebarWidth = isOpen ? "320px" : "55px";
+  const sidebarWidth = isOpen ? "320px" : "20px";
 
   return (
     <motion.div
       initial={false}
       animate={{ width: sidebarWidth }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className={`h-full bg-[var(--bg-primary)] border-r-[2px] border-[var(--cartoon-border-dark)] flex flex-col overflow-hidden ${
+      className={`h-full bg-[var(--bg-primary)] border-r-[2px] border-[var(--cartoon-border-dark)] flex flex-col overflow-hidden relative ${
         theme === "dark" ? "bg-[var(--bg-primary)]" : "bg-[var(--bg-primary)]"
       }`}
       style={{
         fontFamily: "var(--cartoon-font)",
       }}
     >
-      {/* Sidebar Header */}
-      <div className="flex items-center justify-between px-4 py-3 mt-1">
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.h2
-              key="title"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className={`text-lg font-bold text-[var(--text-heading)] ${
-                theme === "dark"
-                  ? "text-[var(--text-heading)]"
-                  : "text-[var(--text-heading)]"
-              }`}
-            >
-              Navigation
-            </motion.h2>
-          ) : null}
-        </AnimatePresence>
-
-        <button
-          onClick={onToggle}
-          className={`action-btn  text-sm ${
-            theme === "dark"
-              ? "text-[var(--text-primary)]"
-              : "text-[var(--text-primary)]"
-          }`}
-          title={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          {isOpen ? <FaChevronLeft /> : <FaChevronRight />}
-        </button>
-      </div>
-
       {/* Sidebar Content */}
       <div className="flex-1 overflow-y-auto p-2 flex flex-col">
         <AnimatePresence>
@@ -255,29 +221,16 @@ const Sidebar = ({
               className="flex flex-col h-full"
             >
               {/* Boards Section */}
-              <div className="flex-1 mb-4">
+              <div className="flex-1 mb-4 mt-2">
                 {/* Boards Section Header */}
-                <div className="flex items-center justify-between mb-4 pb-2">
-                  <span
-                    className={`text-base font-bold text-[var(--text-heading)] uppercase tracking-wide ${
-                      theme === "dark"
-                        ? "text-[var(--text-heading)]"
-                        : "text-[var(--text-heading)]"
-                    }`}
-                  >
-                    My Spaces
-                  </span>
-                  <button
-                    onClick={handleAddBoard}
-                    className={`action-btn p-2 text-xs ${
-                      theme === "dark"
-                        ? "text-[var(--text-primary)]"
-                        : "text-[var(--text-primary)]"
-                    }`}
-                    title="Add new board"
-                  >
-                    <FaPlus />
-                  </button>
+                <div className="mb-4 py-2 px-4">
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`text-lg font-black text-[var(--text-heading)] underline-offset-4  first-letter:underline uppercase tracking-wide`}
+                    >
+                      My Spaces
+                    </span>
+                  </div>
                 </div>
 
                 {/* Boards List */}
@@ -291,7 +244,7 @@ const Sidebar = ({
                       <div key={board.id} className="select-none">
                         {/* Board Item */}
                         <div
-                          className={`flex items-center p-3 rounded-lg cursor-pointer group transition-all duration-150 ${
+                          className={`flex items-center p-2 rounded-lg cursor-pointer group transition-all duration-150 ${
                             isActive
                               ? "bg-[var(--cartoon-primary)] text-[var(--text-inverted)]"
                               : `hover:bg-[var(--cartoon-bg-medium)] ${
@@ -400,7 +353,7 @@ const Sidebar = ({
                               {boardPhases.map((phase) => (
                                 <div
                                   key={phase.id}
-                                  className={`flex items-center p-2.5 rounded-md cursor-pointer group transition-all duration-150 ${
+                                  className={`flex items-center p-1.5 rounded-md cursor-pointer group transition-all duration-150 ${
                                     activePhaseId === phase.id
                                       ? "bg-[var(--cartoon-accent)] text-[var(--button-secondary-text)]"
                                       : "hover:bg-[var(--cartoon-bg-light)] text-[var(--text-secondary)]"
@@ -506,37 +459,178 @@ const Sidebar = ({
                       </div>
                     );
                   })}
+
+                  {/* Add New Space Button */}
+                  {isAddingNewSpace ? (
+                    <div className="flex items-center w-full p-3 mt-3 rounded-lg border-2 border-dashed border-[var(--cartoon-border-dark)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                      <input
+                        ref={newSpaceInputRef}
+                        type="text"
+                        value={newSpaceName}
+                        onChange={(e) => setNewSpaceName(e.target.value)}
+                        onBlur={saveNewSpace}
+                        onKeyDown={handleNewSpaceKeyDown}
+                        className={`input-base text-sm py-1 px-2 flex-1 mr-2 ${
+                          theme === "dark"
+                            ? "text-[var(--text-primary)]"
+                            : "text-[var(--text-primary)]"
+                        }`}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1 rounded hover:bg-black/10 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      >
+                        <FaPlus className="text-sm" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleAddBoard}
+                      className={`flex items-center w-full p-3 mt-3 rounded-lg border-2 border-dashed border-[var(--cartoon-border-dark)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] ${
+                        theme === "dark"
+                          ? "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      }`}
+                      title="Add new space"
+                    >
+                      <FaPlus className="mr-3 text-sm" />
+                      <span className="font-medium">Add New Space</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* File Operations Section */}
               <div className="border-t border-[var(--cartoon-border-dark)] pt-3">
-                <div className="space-y-2">
-                  {/* Load MD Button */}
-                  <motion.label
-                    htmlFor="md-upload"
-                    className="btn btn-secondary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
-                    title="Load tasks from .MD file into current board"
-                  >
-                    <FaFolderOpen className="text-sm" /> Load MD
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      id="md-upload"
-                      accept=".md"
-                      className="hidden"
-                      onChange={internalHandleFileChange}
-                    />
-                  </motion.label>
+                {/* Display current file name if available */}
+                {fileName && (
+                  <div className="mb-3 px-2 text-xs text-[var(--text-secondary)]">
+                    <span className="font-medium">Editing:</span>{" "}
+                    <span className="text-[var(--text-primary)] font-semibold">
+                      {fileName}
+                    </span>
+                  </div>
+                )}
 
-                  {/* Export MD Button */}
-                  <motion.button
-                    onClick={handleExportMarkdown}
-                    className="btn btn-secondary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
-                    title="Export current board to .MD file"
-                  >
-                    <FaDownload className="text-sm" /> Export MD
-                  </motion.button>
+                <div className="space-y-2">
+                  {isApiSupported ? (
+                    <>
+                      {/* File System Access API Buttons */}
+                      <motion.button
+                        onClick={onOpenFile}
+                        className="btn btn-secondary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
+                        title="Open a .MD file"
+                      >
+                        <FaFolderOpen className="text-sm" /> Open
+                      </motion.button>
+
+                      <motion.button
+                        onClick={onSaveFile}
+                        className="btn btn-primary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
+                        title="Save changes to current file"
+                      >
+                        <FaSave className="text-sm" /> Save
+                      </motion.button>
+
+                      <motion.button
+                        onClick={onSaveFileAs}
+                        className="btn btn-secondary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
+                        title="Save as new file"
+                      >
+                        <FaFileExport className="text-sm" /> Save As
+                      </motion.button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Fallback for unsupported browsers */}
+                      <motion.label
+                        htmlFor="md-upload"
+                        className="btn btn-secondary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
+                        title="Load tasks from .MD file into current board"
+                      >
+                        <FaFolderOpen className="text-sm" /> Load MD
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          id="md-upload"
+                          accept=".md"
+                          className="hidden"
+                          onChange={(event) => {
+                            const file = event.target.files[0];
+                            if (file) {
+                              // Check file extension instead of MIME type (more reliable for .md files)
+                              const fileName = file.name.toLowerCase();
+                              if (
+                                fileName.endsWith(".md") ||
+                                fileName.endsWith(".markdown")
+                              ) {
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                  try {
+                                    const content = e.target.result;
+                                    console.log(
+                                      "File loaded successfully:",
+                                      fileName
+                                    );
+                                    onLoadMarkdown(content);
+                                  } catch (error) {
+                                    console.error(
+                                      "Error processing file content:",
+                                      error
+                                    );
+                                  }
+                                };
+                                reader.onerror = (error) => {
+                                  console.error("Error reading file:", error);
+                                };
+                                reader.readAsText(file);
+                              } else {
+                                console.warn(
+                                  "Please select a valid Markdown (.md) file."
+                                );
+                                alert(
+                                  "Please select a valid Markdown (.md) file."
+                                );
+                              }
+                            }
+                            event.target.value = "";
+                          }}
+                        />
+                      </motion.label>
+
+                      <motion.button
+                        onClick={() => {
+                          try {
+                            if (!activeBoard) {
+                              console.warn("No active board to export");
+                              return;
+                            }
+                            const content = exportContent(activeBoard);
+                            const blob = new Blob([content], {
+                              type: "text/markdown",
+                            });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `${activeBoard.name}-${
+                              new Date().toISOString().split("T")[0]
+                            }.md`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          } catch (error) {
+                            console.error("Error exporting markdown:", error);
+                          }
+                        }}
+                        className="btn btn-secondary px-3 py-2.5 text-sm cursor-pointer flex items-center gap-2 w-full"
+                        title="Export current board to .MD file"
+                      >
+                        <FaFileExport className="text-sm" /> Export MD
+                      </motion.button>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

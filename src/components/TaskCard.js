@@ -303,7 +303,7 @@ const TaskCard = React.memo(
             />
           ) : (
             <span
-              className="task-card-text text-sm leading-snug break-words flex-grow"
+              className="task-card-text text-xs leading-snug break-words flex-grow"
               style={{ color: "var(--cartoon-text)", fontWeight: 400 }}
             >
               {task.text}
@@ -311,7 +311,7 @@ const TaskCard = React.memo(
           )}
           <button
             // Small circular action button for delete
-            className="w-7 h-7 p-0 flex items-center justify-center rounded-full border-2 border-solid bg-white shadow-[1.5px_1.5px_0px_var(--cartoon-border-dark)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[0.5px_0.5px_0px_var(--cartoon-border-dark)] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-none transition-all duration-100 ease-in-out flex-shrink-0"
+            className="w-5 h-5 p-0 flex items-center justify-center rounded-full border-2 border-solid bg-white shadow-[1.5px_1.5px_0px_var(--cartoon-border-dark)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[0.5px_0.5px_0px_var(--cartoon-border-dark)] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-none transition-all duration-100 ease-in-out flex-shrink-0"
             style={{
               borderColor: "var(--cartoon-border-dark)",
               color: "var(--cartoon-secondary)",

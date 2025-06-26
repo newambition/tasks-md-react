@@ -114,7 +114,6 @@ function App() {
               onToggle={() => setSidebarOpen(!sidebarOpen)}
               boards={boards}
               activeBoard={null}
-              activeBoardPhases={[]}
               activePhaseId={null}
               onAddBoard={actions.addBoard}
               onSelectBoard={actions.selectBoard}
@@ -190,7 +189,6 @@ function App() {
             onToggle={() => setSidebarOpen(!sidebarOpen)}
             boards={boards}
             activeBoard={activeBoard}
-            activeBoardPhases={activeBoard.phases || []}
             activePhaseId={activePhaseId}
             onAddBoard={actions.addBoard}
             onSelectBoard={actions.selectBoard}

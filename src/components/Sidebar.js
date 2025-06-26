@@ -1,4 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTheme } from "../context/ThemeContext";
+import { exportContent } from "../utils/helpers";
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaChevronLeft,
@@ -9,6 +12,7 @@ import {
   FaPlus,
   FaEdit,
   FaTrash,
+  FaDownload,
 } from "react-icons/fa";
 
 const Sidebar = ({
@@ -16,7 +20,6 @@ const Sidebar = ({
   onToggle,
   boards = [],
   activeBoard,
-  activeBoardPhases = [],
   activePhaseId,
   onAddBoard,
   onSelectBoard,
@@ -26,7 +29,10 @@ const Sidebar = ({
   onAddPhase,
   onRenamePhase,
   onDeletePhase,
+  tasks = [],
+  onLoadMarkdown,
 }) => {
+  const { theme } = useTheme();
   const [expandedBoards, setExpandedBoards] = useState(new Set());
   const [editingBoardId, setEditingBoardId] = useState(null);
   const [editingPhaseId, setEditingPhaseId] = useState(null);
@@ -34,6 +40,7 @@ const Sidebar = ({
   const [editingPhaseName, setEditingPhaseName] = useState("");
   const boardInputRef = useRef(null);
   const phaseInputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Auto-expand the active board
   useEffect(() => {
@@ -151,8 +158,40 @@ const Sidebar = ({
 
   const handleDeletePhase = (phaseId, e) => {
     e.stopPropagation();
-    if (activeBoardPhases.length > 1) {
+    if (activeBoard.phases.length > 1) {
       onDeletePhase(phaseId);
+    }
+  };
+
+  const internalHandleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === "text/markdown") {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        onLoadMarkdown(content);
+      };
+      reader.readAsText(file);
+    } else {
+      console.warn("Please select a valid Markdown (.md) file.");
+    }
+    event.target.value = "";
+  };
+
+  const handleExportMarkdown = () => {
+    try {
+      const content = exportContent(tasks);
+      const blob = new Blob([content], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `tasks-${new Date().toISOString().split("T")[0]}.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error exporting markdown:", error);
     }
   };
 
@@ -163,7 +202,9 @@ const Sidebar = ({
       initial={false}
       animate={{ width: sidebarWidth }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="h-full bg-[var(--bg-primary)] border-r-[2px] border-[var(--cartoon-border-dark)] flex flex-col overflow-hidden"
+      className={`h-full bg-[var(--bg-primary)] border-r-[2px] border-[var(--cartoon-border-dark)] flex flex-col overflow-hidden ${
+        theme === "dark" ? "bg-[var(--bg-primary)]" : "bg-[var(--bg-primary)]"
+      }`}
       style={{
         fontFamily: "var(--cartoon-font)",
       }}
@@ -178,7 +219,11 @@ const Sidebar = ({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              className="text-lg font-bold text-[var(--text-heading)]"
+              className={`text-lg font-bold text-[var(--text-heading)] ${
+                theme === "dark"
+                  ? "text-[var(--text-heading)]"
+                  : "text-[var(--text-heading)]"
+              }`}
             >
               Navigation
             </motion.h2>
@@ -187,7 +232,11 @@ const Sidebar = ({
 
         <button
           onClick={onToggle}
-          className="action-btn  text-sm"
+          className={`action-btn  text-sm ${
+            theme === "dark"
+              ? "text-[var(--text-primary)]"
+              : "text-[var(--text-primary)]"
+          }`}
           title={isOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
           {isOpen ? <FaChevronLeft /> : <FaChevronRight />}
@@ -203,16 +252,57 @@ const Sidebar = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, delay: 0.1 }}
-              className="space-y-2"
+              className="space-y-3"
             >
+              {/* File Operations Section */}
+              <div className="mb-4 pt-4 pb-4 border-t border-b border-[var(--cartoon-border-dark)]">
+                <div className="flex items-center justify-between"></div>
+                <div className="space-y-3">
+                  {/* Load MD Button */}
+                  <motion.label
+                    htmlFor="md-upload"
+                    className="btn btn-secondary px-3 py-2 text-sm cursor-pointer flex items-center gap-1.5 w-full"
+                    title="Load tasks from .MD file into current board"
+                  >
+                    <FaFolderOpen /> Load MD
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      id="md-upload"
+                      accept=".md"
+                      className="hidden"
+                      onChange={internalHandleFileChange}
+                    />
+                  </motion.label>
+
+                  {/* Export MD Button */}
+                  <motion.button
+                    onClick={handleExportMarkdown}
+                    className="btn btn-secondary px-3 py-2 text-sm cursor-pointer flex items-center gap-1.5 w-full"
+                    title="Export current board to .MD file"
+                  >
+                    <FaDownload /> Export MD
+                  </motion.button>
+                </div>
+              </div>
               {/* Boards Section Header */}
-              <div className="flex items-center justify-between mt-2 mb-4">
-                <span className="text-base font-bold text-[var(--text-secondary)] uppercase tracking-wide">
-                  Boards
+              <div className="flex items-center justify-between mt-2 mb-2 px-2">
+                <span
+                  className={`text-base font-bold text-[var(--text-heading)] uppercase tracking-wide ${
+                    theme === "dark"
+                      ? "text-[var(--text-heading)]"
+                      : "text-[var(--text-heading)]"
+                  }`}
+                >
+                  My Boards
                 </span>
                 <button
                   onClick={handleAddBoard}
-                  className="action-btn p-1 text-xs"
+                  className={`action-btn p-3 text-xs ${
+                    theme === "dark"
+                      ? "text-[var(--text-primary)]"
+                      : "text-[var(--text-primary)]"
+                  }`}
                   title="Add new board"
                 >
                   <FaPlus />
@@ -220,11 +310,11 @@ const Sidebar = ({
               </div>
 
               {/* Boards List */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {boards.map((board) => {
                   const isExpanded = expandedBoards.has(board.id);
                   const isActive = activeBoard?.id === board.id;
-                  const boardPhases = isActive ? activeBoardPhases : [];
+                  const boardPhases = isActive ? activeBoard.phases : [];
 
                   return (
                     <div key={board.id} className="select-none">
@@ -233,7 +323,11 @@ const Sidebar = ({
                         className={`flex items-center p-2 rounded-lg cursor-pointer group transition-all duration-150 ${
                           isActive
                             ? "bg-[var(--cartoon-primary)] text-[var(--text-inverted)]"
-                            : "hover:bg-[var(--cartoon-bg-medium)] text-[var(--text-primary)]"
+                            : `hover:bg-[var(--cartoon-bg-medium)] ${
+                                theme === "dark"
+                                  ? "text-[var(--text-primary)]"
+                                  : "text-[var(--text-primary)]"
+                              }`
                         }`}
                         onClick={() => {
                           if (!isActive) {
@@ -243,7 +337,11 @@ const Sidebar = ({
                         }}
                       >
                         <button
-                          className="mr-2 p-1 rounded hover:bg-black/10"
+                          className={`mr-2 p-1 rounded hover:bg-black/10 ${
+                            theme === "dark"
+                              ? "text-[var(--text-primary)]"
+                              : "text-[var(--text-primary)]"
+                          }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleBoardExpansion(board.id);
@@ -266,11 +364,21 @@ const Sidebar = ({
                             }
                             onBlur={saveEditingBoard}
                             onKeyDown={handleBoardKeyDown}
-                            className="input-base text-sm py-1 px-2 flex-1 mr-2"
+                            className={`input-base text-sm py-1 px-2 flex-1 mr-2 ${
+                              theme === "dark"
+                                ? "text-[var(--text-primary)]"
+                                : "text-[var(--text-primary)]"
+                            }`}
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
-                          <span className="flex-1 truncate text-sm font-semibold">
+                          <span
+                            className={`flex-1 truncate text-sm font-semibold ${
+                              theme === "dark"
+                                ? "text-[var(--text-primary)]"
+                                : "text-[var(--text-primary)]"
+                            }`}
+                          >
                             {board.name}
                           </span>
                         )}
@@ -280,7 +388,11 @@ const Sidebar = ({
                           <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                               onClick={(e) => startEditingBoard(board, e)}
-                              className="p-1 rounded hover:bg-black/10 text-xs mr-1"
+                              className={`p-1 rounded hover:bg-black/10 text-xs mr-1 ${
+                                theme === "dark"
+                                  ? "text-[var(--text-primary)]"
+                                  : "text-[var(--text-primary)]"
+                              }`}
                               title="Rename board"
                             >
                               <FaEdit />
@@ -288,7 +400,11 @@ const Sidebar = ({
                             {boards.length > 1 && (
                               <button
                                 onClick={(e) => handleDeleteBoard(board.id, e)}
-                                className="p-1 rounded hover:bg-black/10 text-xs text-[var(--delete-btn-text)]"
+                                className={`p-1 rounded hover:bg-black/10 text-xs text-[var(--delete-btn-text)] ${
+                                  theme === "dark"
+                                    ? "text-[var(--delete-btn-text)]"
+                                    : "text-[var(--delete-btn-text)]"
+                                }`}
                                 title="Delete board"
                               >
                                 <FaTrash />
@@ -330,11 +446,21 @@ const Sidebar = ({
                                     }
                                     onBlur={saveEditingPhase}
                                     onKeyDown={handlePhaseKeyDown}
-                                    className="input-base text-sm py-1 px-2 flex-1 mr-2"
+                                    className={`input-base text-sm py-1 px-2 flex-1 mr-2 ${
+                                      theme === "dark"
+                                        ? "text-[var(--text-primary)]"
+                                        : "text-[var(--text-primary)]"
+                                    }`}
                                     onClick={(e) => e.stopPropagation()}
                                   />
                                 ) : (
-                                  <span className="flex-1 truncate text-sm">
+                                  <span
+                                    className={`flex-1 truncate text-sm ${
+                                      theme === "dark"
+                                        ? "text-[var(--text-primary)]"
+                                        : "text-[var(--text-primary)]"
+                                    }`}
+                                  >
                                     {phase.name}
                                   </span>
                                 )}
@@ -346,7 +472,11 @@ const Sidebar = ({
                                       onClick={(e) =>
                                         startEditingPhase(phase, e)
                                       }
-                                      className="p-1 rounded hover:bg-black/10 text-xs mr-1"
+                                      className={`p-1 rounded hover:bg-black/10 text-xs mr-1 ${
+                                        theme === "dark"
+                                          ? "text-[var(--text-primary)]"
+                                          : "text-[var(--text-primary)]"
+                                      }`}
                                       title="Rename phase"
                                     >
                                       <FaEdit />
@@ -356,7 +486,11 @@ const Sidebar = ({
                                         onClick={(e) =>
                                           handleDeletePhase(phase.id, e)
                                         }
-                                        className="p-1 rounded hover:bg-black/10 text-xs text-[var(--delete-btn-text)]"
+                                        className={`p-1 rounded hover:bg-black/10 text-xs text-[var(--delete-btn-text)] ${
+                                          theme === "dark"
+                                            ? "text-[var(--delete-btn-text)]"
+                                            : "text-[var(--delete-btn-text)]"
+                                        }`}
                                         title="Delete phase"
                                       >
                                         <FaTrash />
@@ -370,7 +504,7 @@ const Sidebar = ({
                             {/* Add Phase Button */}
                             <button
                               onClick={(e) => handleAddPhase(board.id, e)}
-                              className="flex items-center w-full p-2 rounded-md text-[var(--cartoon-green)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm"
+                              className={`flex items-center w-full p-2 rounded-md text-[var(--cartoon-green)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm`}
                             >
                               <FaPlus className="mr-2 text-xs" />
                               Add Phase
@@ -389,7 +523,7 @@ const Sidebar = ({
                         >
                           <button
                             onClick={(e) => handleAddPhase(board.id, e)}
-                            className="flex items-center w-full p-2 rounded-md text-[var(--cartoon-green)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm"
+                            className={`flex items-center w-full p-2 rounded-md text-[var(--cartoon-green)] hover:bg-[var(--cartoon-bg-light)] transition-colors text-sm`}
                           >
                             <FaPlus className="mr-2 text-xs" />
                             Add First Phase

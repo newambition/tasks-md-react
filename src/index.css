@@ -202,9 +202,9 @@ body {
 }
 .btn:focus {
   @apply ring-2 ring-offset-1;
-  ring-color: var(--cartoon-primary);
   /* Use a consistent ring offset color for both light and dark */
-  ring-offset-color: var(--bg-primary);
+  --ring-color: var(--cartoon-primary);
+  --ring-offset-color: var(--bg-primary);
 }
 .btn:hover {
   transform: translate(1px, 1px); /* [cite: 24] */
@@ -277,8 +277,8 @@ html.dark .styled-select {
 }
 .styled-select:focus {
   @apply outline-none ring-2 ring-offset-1;
-  ring-color: var(--cartoon-primary);
-  ring-offset-color: var(--bg-primary); /* Use main bg for offset */
+  --ring-color: var(--cartoon-primary);
+  --ring-offset-color: var(--bg-primary); /* Use main bg for offset */
   border-color: var(--cartoon-primary);
 }
 

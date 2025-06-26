@@ -1,15 +1,13 @@
 // src/components/Header.js
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "../context/ThemeContext";
-import { FaFolderOpen, FaInfoCircle, FaDownload } from "react-icons/fa";
+import { FaInfoCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 import InfoModal from "./InfoModal";
-import { exportContent } from "../utils/helpers";
 
 const Header = React.memo(
   ({
     tasks = [],
-    onLoadMarkdown,
     searchTerm,
     onSearchChange,
     // Label filter props
@@ -23,7 +21,6 @@ const Header = React.memo(
     const { theme, toggleTheme } = useTheme();
     const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
     const filterDropdownRef = useRef(null);
-    const fileInputRef = useRef(null);
 
     const [infoOpen, setInfoOpen] = useState(false);
     const closeInfoModal = useCallback(() => setInfoOpen(false), []);
@@ -59,38 +56,6 @@ const Header = React.memo(
       onDueDateFilterChange(null);
     };
 
-    const internalHandleFileChange = (event) => {
-      const file = event.target.files[0];
-      if (file && file.type === "text/markdown") {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const content = e.target.result;
-          onLoadMarkdown(content);
-        };
-        reader.readAsText(file);
-      } else {
-        console.warn("Please select a valid Markdown (.md) file.");
-      }
-      event.target.value = "";
-    };
-
-    const handleExportMarkdown = () => {
-      try {
-        const content = exportContent(tasks);
-        const blob = new Blob([content], { type: "text/markdown" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `tasks-${new Date().toISOString().split("T")[0]}.md`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } catch (error) {
-        console.error("Error exporting markdown:", error);
-      }
-    };
-
     return (
       <motion.header
         initial={{ y: -80, opacity: 0 }}
@@ -104,7 +69,7 @@ const Header = React.memo(
           fontFamily: "var(--cartoon-font)",
         }}
       >
-        <div className="flex items-center justify-between w-full px-4 py-2 ">
+        <div className="flex items-center justify-between w-full px-4 py-3 ">
           <div className="flex items-center gap-3 md:gap-4 flex-wrap">
             <h1
               className="text-3xl md:text-3xl font-black mr-2 md:mx-2 mt-1 tracking-tighter cursor-default select-none"
@@ -244,32 +209,6 @@ const Header = React.memo(
           </div>
 
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Load MD Button */}
-            <motion.label
-              htmlFor="md-upload"
-              className="btn btn-secondary px-3 py-2 text-sm cursor-pointer flex items-center gap-1.5"
-              title="Load tasks from .MD file into current board"
-            >
-              <FaFolderOpen /> Load MD
-              <input
-                ref={fileInputRef}
-                type="file"
-                id="md-upload"
-                accept=".md"
-                className="hidden"
-                onChange={internalHandleFileChange}
-              />
-            </motion.label>
-
-            {/* Export MD Button */}
-            <motion.button
-              onClick={handleExportMarkdown}
-              className="btn btn-secondary px-3 py-2 text-sm cursor-pointer flex items-center gap-1.5"
-              title="Export current board to .MD file"
-            >
-              <FaDownload /> Export MD
-            </motion.button>
-
             {/* Theme Toggle */}
             <div
               className="relative flex items-center cursor-pointer select-none p-1"

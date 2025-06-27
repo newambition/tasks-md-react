@@ -40,8 +40,11 @@ function parseLabels(taskText) {
     }
 
     // Remove this label from the clean text
-    cleanText = cleanText.replace(fullMatch, "").trim();
+    cleanText = cleanText.replace(fullMatch, "");
   }
+
+  // Collapse multiple spaces into one and trim whitespace
+  cleanText = cleanText.replace(/\s\s+/g, ' ').trim();
 
   return { cleanText, labels };
 }
